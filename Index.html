@@ -65,6 +65,27 @@ button,input,select{font:inherit;color:inherit}
 .kpi .val{font-family:var(--f-display);font-size:1.6rem;font-weight:600;line-height:1.2}
 .kpi .val small{font-size:.8rem;font-weight:500;color:var(--muted);margin-left:4px;font-family:var(--f-body)}
 .kpi .note{font-size:.78rem;color:var(--muted)}
+.exec{display:grid}
+.exec .panel-h{align-items:flex-end}
+.tariff{font-size:.8rem;color:var(--ink-2);display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.tariff input{width:70px;border:1px solid var(--line);background:var(--bg);border-radius:8px;padding:5px 8px;text-align:right}
+.exec-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:8px 28px;padding:16px}
+.exec-grid>div{min-width:0}
+.exec h3{margin-bottom:8px}
+.exec h3 small{font-weight:400;color:var(--muted);font-size:.8rem;font-family:var(--f-body)}
+.find{margin:0;padding:0;list-style:none;counter-reset:f;display:grid;gap:12px}
+.find li{counter-increment:f;display:grid;grid-template-columns:28px 1fr;gap:2px 10px;font-size:.9rem;color:var(--ink-2)}
+.find li::before{content:counter(f);grid-row:span 2;width:24px;height:24px;border-radius:999px;background:var(--navy);color:var(--on-navy);display:grid;place-items:center;font-size:.75rem;font-weight:700}
+.find.rec li::before{background:var(--accent)}
+.find b{color:var(--ink);font-weight:600}
+.exec-pri{padding:4px 16px 16px;border-top:1px solid var(--line);padding-top:14px}
+.exec-pri th{position:static}
+.kpis{grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}
+button.kpi{font:inherit;color:inherit;text-align:left;cursor:pointer;width:100%}
+.kpi.act:hover{border-color:var(--accent)}
+.kpi .val.sm{font-size:1.05rem;line-height:1.35;padding-block:6px 2px}
+.kpi.warn-k{border-color:var(--bad-soft);background:linear-gradient(var(--bad),var(--bad)) left/4px 100% no-repeat,var(--surface)}
+.kpi.warn-k .val{color:var(--bad)}
 
 /* pills */
 .pill{display:inline-flex;align-items:center;gap:4px;font-size:.72rem;font-weight:600;border-radius:999px;padding:1px 8px;white-space:nowrap;line-height:1.6}
@@ -103,6 +124,12 @@ tbody tr.sel{background:var(--accent-soft)}
 tbody tr.dim td{color:var(--muted)}
 .rank{color:var(--muted);font-size:.78rem;width:28px}
 .uname{font-weight:500;min-width:180px}
+tr.flagged td:first-child{box-shadow:inset 4px 0 0 var(--bad)}
+.flag{margin-left:6px;cursor:help;vertical-align:1px}
+.seg button[data-v="flag"][aria-pressed="false"]{color:var(--bad)}
+.seg button[data-v="better"][aria-pressed="false"]{color:var(--good)}
+.seg button[data-v="better"][aria-pressed="true"]{background:var(--good);color:var(--on-navy)}
+.seg button[data-v="flag"][aria-pressed="true"]{background:var(--bad);color:var(--on-navy)}
 .nm{text-decoration:underline dotted var(--muted);text-underline-offset:4px}
 tbody tr:hover .nm{color:var(--accent);text-decoration-color:var(--accent)}
 .modal{position:fixed;inset:0;z-index:40;display:grid;place-items:center;padding-block:max(16px,env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-bottom,0px));padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
@@ -164,6 +191,68 @@ tr.sel .fill{background:var(--accent)}
 .src{font-size:.78rem;color:var(--muted)}
 #tip{position:fixed;pointer-events:none;background:var(--ink);color:var(--bg);font-size:.78rem;padding:6px 9px;border-radius:6px;z-index:50;max-width:240px;line-height:1.4}
 @media (prefers-reduced-motion:no-preference){.fill{transition:width .35s ease}}
+
+/* ---------- responsive: desktop keeps the layout above; phones get a stacked card layout ---------- */
+.top-ctl{display:grid;gap:8px;justify-items:end}
+.tools-toggle,.m-only{display:none}
+@media (max-width:640px){
+  .wrap{gap:14px;padding-block:12px 40px}
+  .top{padding:18px 16px;gap:14px}
+  .top>div{width:100%}
+  .top-ctl{justify-items:stretch}
+  .years{display:grid;grid-template-columns:repeat(auto-fit,minmax(60px,1fr));border-radius:14px}
+  .years button{min-height:48px;border-radius:10px}
+  .period{justify-content:flex-start}
+  .kpis{grid-template-columns:1fr;gap:10px}
+  .kpi{padding:14px}
+  .panel-h{padding:12px 14px}
+  .exec .panel-h{align-items:stretch}
+  .tariff{width:100%}
+  .tariff input{min-height:44px;flex:1}
+  .exec-grid{grid-template-columns:1fr;padding:14px;gap:18px}
+  .exec-pri{padding:14px}
+
+  .tools-toggle{display:flex;width:100%;min-height:44px;justify-content:space-between;align-items:center;gap:8px;text-align:left}
+  .tools-toggle .chev{transition:transform .2s}
+  .tools-toggle[aria-expanded="true"] .chev{transform:rotate(180deg)}
+  .tools{display:none;width:100%}
+  .tools.open{display:grid;gap:10px}
+  .m-only{display:grid}
+  .sort-l{gap:4px;font-size:.8rem;color:var(--ink-2)}
+  .sort-l select{min-height:44px;border:1px solid var(--line);background:var(--bg);border-radius:8px;padding:0 10px}
+  .search{width:100%;min-height:44px}
+  .seg{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;width:100%}
+  .seg button{min-height:44px;padding:6px 8px}
+  .btn{min-height:44px;padding:8px 14px}
+  .foot{padding:12px 14px}
+  .foot .btn{width:100%}
+  .x{width:44px;height:44px}
+  .field input{min-height:44px}
+
+  /* main table becomes one card per unit */
+  #mainTbl thead,#execTbl thead{display:none}
+  #mainTbl,#mainTbl tbody,#execTbl,#execTbl tbody{display:block;width:100%}
+  #mainTbl tr{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));grid-template-areas:"name name name" "ratio ratio ratio" "a b d";gap:10px 12px;padding:14px;border-bottom:1px solid var(--line);min-height:44px}
+  #mainTbl td{border:0;padding:0;min-width:0}
+  #mainTbl td.rank{display:none}
+  #mainTbl td.uname{grid-area:name;min-width:0}
+  #mainTbl td.ratio-cell{grid-area:ratio;min-width:0;border-radius:8px;padding:8px 10px}
+  #mainTbl td.c-a{grid-area:a} #mainTbl td.c-b{grid-area:b} #mainTbl td.c-d{grid-area:d}
+  #mainTbl td.num,#execTbl td.num{text-align:left;white-space:normal}
+  #mainTbl td[data-label]::before,#execTbl td[data-label]::before{content:attr(data-label);display:block;font-size:.7rem;color:var(--muted);font-weight:400;margin-bottom:2px}
+  #mainTbl tr.flagged{box-shadow:inset 4px 0 0 var(--bad)}
+  #mainTbl tr.flagged td:first-child{box-shadow:none}
+  #mainTbl td[colspan]{grid-column:1/-1}
+  #execTbl tr{display:grid;grid-template-columns:1fr 1fr;gap:10px 12px;padding:12px 0;border-bottom:1px solid var(--line)}
+  #execTbl td{border:0;padding:0}
+  #execTbl td.uname{grid-column:1/-1;min-width:0}
+  .uname{min-width:0}
+
+  .modal{place-items:end stretch;padding:0}
+  .modal .detail{width:100%;max-height:92%;border-radius:16px 16px 0 0;padding-bottom:calc(18px + env(safe-area-inset-bottom,0px))}
+  .mt th,.mt td{display:block;width:auto}
+  .mt th{border-bottom:0;padding-bottom:4px}
+}
 </style>
 <div class="wrap">
   <header class="top">
@@ -172,7 +261,7 @@ tr.sel .fill{background:var(--accent)}
       <h1>ดัชนีไฟฟ้าต่อรายรับ มจธ.</h1>
       <p class="sub">หน่วยการใช้ไฟฟ้า (kWh) ต่อรายรับสุทธิ 1,000 บาท ของแต่ละหน่วยงาน ยิ่งค่าต่ำ ยิ่งใช้ไฟฟ้าอย่างมีประสิทธิภาพเมื่อเทียบกับรายรับ</p>
     </div>
-    <div style="display:grid;gap:8px;justify-items:end">
+    <div class="top-ctl">
       <div class="years" id="years" role="group" aria-label="เลือกปี"></div>
       <div class="period" id="period"></div>
     </div>
@@ -180,11 +269,37 @@ tr.sel .fill{background:var(--accent)}
 
   <section class="kpis" id="kpis" aria-label="สรุปภาพรวม"></section>
 
+  <section class="panel exec" aria-labelledby="eh">
+    <div class="panel-h">
+      <div><div class="eyebrow">สำหรับผู้บริหาร</div><h2 id="eh">สรุปและวิเคราะห์ ปี <span id="execYear"></span></h2></div>
+      <label class="tariff" for="tariff">ค่าไฟเฉลี่ยที่ใช้ประมาณการ <input id="tariff" inputmode="decimal" value="4.50"> บาท/kWh</label>
+    </div>
+    <div class="exec-grid">
+      <div><h3>ข้อค้นพบสำคัญ</h3><ol class="find" id="execFind"></ol></div>
+      <div><h3>ข้อเสนอแนะ</h3><ol class="find rec" id="execRec"></ol></div>
+    </div>
+    <div class="exec-pri">
+      <h3>ศักยภาพประหยัดรายหน่วยงาน <small>ถ้าอัตราส่วนลดลงมาเท่าค่ากลาง</small></h3>
+      <div class="tbl-wrap"><table id="execTbl">
+        <thead><tr><th>หน่วยงาน</th><th class="num">อัตราส่วน</th><th class="num">ไฟฟ้า (kWh)</th><th class="num">ลดได้ (kWh)</th><th class="num">ประหยัดประมาณ</th></tr></thead>
+        <tbody id="execPri"></tbody></table></div>
+    </div>
+  </section>
+
   <div class="main">
     <section class="panel" aria-label="อันดับหน่วยงาน">
       <div class="panel-h">
         <h2 id="tblTitle">อันดับหน่วยงาน</h2>
-        <div class="tools">
+        <button class="btn tools-toggle" id="toolsToggle" aria-expanded="false" aria-controls="tools"><span id="toolsSum">ค้นหาและตัวกรอง</span><span class="chev" aria-hidden="true">▾</span></button>
+        <div class="tools" id="tools">
+          <label class="m-only sort-l" for="sortSel">เรียงตาม
+            <select id="sortSel">
+              <option value="ratio:1">อัตราส่วน ต่ำ → สูง</option>
+              <option value="ratio:-1">อัตราส่วน สูง → ต่ำ</option>
+              <option value="delta:1">ลดลงจากปีก่อนมากที่สุด</option>
+              <option value="A:-1">ใช้ไฟมากที่สุด</option>
+              <option value="name:1">ชื่อหน่วยงาน ก → ฮ</option>
+            </select></label>
           <input class="search" id="q" type="search" placeholder="ค้นหาหน่วยงาน…" aria-label="ค้นหาหน่วยงาน">
           <div class="seg" id="kindSeg" role="group" aria-label="ประเภท"></div>
           <div class="seg" id="scaleSeg" role="group" aria-label="สเกลแท่ง">
@@ -194,7 +309,7 @@ tr.sel .fill{background:var(--accent)}
         </div>
       </div>
       <div class="tbl-wrap">
-        <table>
+        <table id="mainTbl">
           <thead><tr id="thead"></tr></thead>
           <tbody id="tbody"></tbody>
         </table>
@@ -260,7 +375,7 @@ const PARTIAL = {"2567":true,"2568":true};
 
 let DATA = ORIGINAL, SRC = ORIGINAL_SRC;
 let YEARS = [], KWH_YEARS = [];
-const S = {year:null, q:"", kind:"all", scale:"log", sort:"ratio", dir:1, sel:null};
+const S = {tariff:4.5, year:null, q:"", kind:"all", scale:"log", sort:"ratio", dir:1, sel:null};
 const $ = id => document.getElementById(id);
 const fmt = (v,d=0) => v==null||!isFinite(v) ? "–" : v.toLocaleString("th-TH",{minimumFractionDigits:d,maximumFractionDigits:d});
 const fmtR = v => v==null ? "–" : fmt(v, v<10?2:(v<100?1:0));
@@ -288,6 +403,23 @@ function delta(u,y){
   if (a.st!=="ok"||b.st!=="ok"||a.r===0) return null;
   return (b.r-a.r)/a.r*100;
 }
+function issues(u,y){
+  const out=[], c=calc(u,y); if(c.st==="noA"||c.st==="noB") return out;
+  if(c.st==="neg") out.push(`รายรับสุทธิติดลบ (${fmt(c.B/1e6,2)} ล้านบาท)`);
+  if(c.st==="ok"){
+    if(c.A===0) out.push("หน่วยการใช้ไฟฟ้าเป็น 0");
+    const med=median(DATA.filter(x=>x.kind==="unit").map(x=>calc(x,y)).filter(k=>k.st==="ok").map(k=>k.r));
+    if(med && c.r>5*med) out.push(`อัตราส่วนสูงกว่าค่ากลางของคณะ/สำนัก ${fmt(c.r/med,1)} เท่า`);
+    const d=delta(u,y); if(d!=null && Math.abs(d)>100) out.push(`อัตราส่วนเพิ่มขึ้น ${fmt(d,0)}% จากปีก่อน`);
+  }
+  const p=prevYear(y);
+  if(p){ const pa=u.kwh[p], pb=u.inc[p];
+    if(pa>0 && c.A>0){ const q=c.A/pa; if(q>2||q<0.5) out.push(`ไฟฟ้า${q>1?"เพิ่มขึ้น":"ลดลง"} ${fmt(Math.abs(q-1)*100,0)}% จากปีก่อน (${fmt(pa)} → ${fmt(c.A)} kWh)`); }
+    if(pb>0 && c.B>0){ const q=c.B/pb; if(q>2||q<0.5) out.push(`รายรับสุทธิ${q>1?"เพิ่มขึ้น":"ลดลง"} ${fmt(Math.abs(q-1)*100,0)}% จากปีก่อน (${fmt(pb/1e6,2)} → ${fmt(c.B/1e6,2)} ล้านบาท)`); }
+  }
+  return out;
+}
+function isBetter(u,y){ const d=delta(u,y); return d!=null && d<0 && !issues(u,y).length; }
 const STATUS = {
   noA:["p-idle","ไม่มีข้อมูลไฟฟ้า"], noB:["p-idle","ไม่มีรายรับแยก"], neg:["p-warn","รายรับสุทธิติดลบ"]
 };
@@ -338,27 +470,79 @@ function renderYears(){
 
 function median(a){ if(!a.length) return null; const s=[...a].sort((x,y)=>x-y), m=s.length>>1; return s.length%2?s[m]:(s[m-1]+s[m])/2; }
 
-function renderKPIs(){
-  const y = S.year, p = prevYear(y);
-  const sumK = yy => DATA.reduce((s,u)=>s+(u.kwh[yy]||0),0);
-  const tot = sumK(y), ptot = p ? sumK(p) : null;
-  const dTot = ptot ? (tot-ptot)/ptot*100 : null;
-  const units = DATA.filter(u=>u.kind!=="nosep");
-  const ok = units.map(u=>calc(u,y)).filter(c=>c.st==="ok");
-  const med = median(DATA.filter(u=>u.kind==="unit").map(u=>calc(u,y)).filter(c=>c.st==="ok").map(c=>c.r));
-  const ds = DATA.map(u=>delta(u,y)).filter(v=>v!=null);
-  const better = ds.filter(v=>v<0).length;
-  const dCls = dTot==null?"":(dTot<=0?"d-good":"d-bad");
-  $("kpis").innerHTML = `
-    <div class="kpi"><span class="lbl">การใช้ไฟฟ้ารวมทุกมิเตอร์</span><span class="val">${fmt(tot/1e6,2)}<small>ล้าน kWh</small></span>
-      <span class="note">${dTot==null?"":`<span class="delta ${dCls}">${dTot>0?"▲":"▼"} ${fmt(Math.abs(dTot),1)}%</span> เทียบปี ${p}`}</span></div>
-    <div class="kpi"><span class="lbl">ก๊าซเรือนกระจกจากไฟฟ้า</span><span class="val">${fmt(tot*EF/1000)}<small>tCO2e</small></span>
-      <span class="note">คิดที่ 0.4999 kgCO2e/kWh</span></div>
-    <div class="kpi"><span class="lbl">ค่ากลางอัตราส่วน (คณะ/สำนัก/ศูนย์)</span><span class="val">${fmtR(med)}<small>kWh / 1,000 บาท</small></span>
-      <span class="note">มัธยฐาน ไม่ถูกดึงด้วยค่าสุดโต่ง</span></div>
-    <div class="kpi"><span class="lbl">หน่วยงานที่คำนวณได้</span><span class="val">${ok.length}<small>จาก ${units.length}</small></span>
-      <span class="note">${ds.length?`${better} หน่วยงานค่าลดลงจากปีก่อน`:"ไม่มีปีก่อนให้เทียบ"}</span></div>`;
+const MONTHS = {"2567":9,"2568":9};
+const months = y => MONTHS[y] || 12;
+const per = y => months(y)===12 ? "ต่อปี" : `ใน ${months(y)} เดือน`;
+function comparable(y){ const prior = KWH_YEARS.filter(x=>x<y && months(x)===months(y)); return prior.length ? prior[prior.length-1] : null; }
+const totK = y => DATA.reduce((s,u)=>s+(u.kwh[y]||0),0);
+const medUnit = y => median(DATA.filter(u=>u.kind==="unit").map(u=>calc(u,y)).filter(c=>c.st==="ok").map(c=>c.r));
+const baht = v => v>=1e6 ? fmt(v/1e6,2)+" ล้านบาท" : fmt(v)+" บาท";
+const sName = n => { const m = n.match(/^([A-Z][A-Za-z+]{1,4})\s+(.*)$/); return m ? m[1] : n; };
+
+function analyse(y){
+  const med = medUnit(y), tot = totK(y);
+  const rows = DATA.map(u=>({u,c:calc(u,y),iss:issues(u,y)}));
+  const clean = rows.filter(r=>r.c.st==="ok" && !r.iss.length && r.u.kind==="unit");
+  const pri = clean.filter(r=>med && r.c.r>med).map(r=>({...r, save:r.c.A - med*r.c.B/1000})).sort((a,b)=>b.save-a.save);
+  const saveK = pri.reduce((s,r)=>s+r.save,0);
+  const unmeasured = rows.filter(r=>r.c.st==="noB" && r.c.A>0).sort((a,b)=>b.c.A-a.c.A);
+  const unK = unmeasured.reduce((s,r)=>s+r.c.A,0);
+  const models = clean.filter(r=>r.c.A>=300000 && r.c.r<=med).sort((a,b)=>a.c.r-b.c.r).slice(0,3);
+  const flagged = rows.filter(r=>r.iss.length);
+  const cy = comparable(y), ctot = cy ? totK(cy) : null;
+  const rising = cy && YEARS.includes(cy) ? clean.map(r=>({...r, pc:calc(r.u,cy)})).filter(r=>r.pc.st==="ok" && r.c.r>=med && r.c.r>1.2*r.pc.r) : [];
+  return {med,tot,clean,pri,saveK,unmeasured,unK,models,rising,flagged,cy,ctot};
 }
+
+function renderKPIs(){
+  const y = S.year, A = analyse(y), t = S.tariff;
+  const cmed = A.cy && YEARS.includes(A.cy) ? medUnit(A.cy) : null;
+  const arrow = d => `<span class="delta ${d<=0?"d-good":"d-bad"}">${d>0?"▲":"▼"} ${fmt(Math.abs(d),1)}%</span>`;
+  $("kpis").innerHTML = `
+    <div class="kpi"><span class="lbl">อัตราส่วนกลางของคณะ/สำนัก</span>
+      <span class="val">${fmtR(A.med)}<small>kWh / 1,000 บาท</small></span>
+      <span class="note">${cmed?`${arrow((A.med-cmed)/cmed*100)} เทียบปี ${A.cy} (${fmtR(cmed)}) ซึ่งมีข้อมูล 12 เดือนเท่ากัน`:"ค่ามัธยฐาน ไม่ถูกดึงด้วยค่าสุดโต่ง"}</span></div>
+    <div class="kpi"><span class="lbl">ไฟฟ้ารวม · ก๊าซเรือนกระจก</span>
+      <span class="val">${fmt(A.tot/1e6,2)}<small>ล้าน kWh</small></span>
+      <span class="note">≈ ${fmt(A.tot*EF/1000)} tCO2e · ค่าไฟประมาณ ${baht(A.tot*t)}${A.ctot?` · ${arrow((A.tot-A.ctot)/A.ctot*100)} จากปี ${A.cy}`:""}</span></div>
+    <div class="kpi"><span class="lbl">ศักยภาพลดการใช้ไฟ</span>
+      <span class="val" style="color:var(--good)">${fmt(A.saveK/1e6,2)}<small>ล้าน kWh ${per(y)}</small></span>
+      <span class="note">≈ ${fmt(A.saveK*EF/1000)} tCO2e · ${baht(A.saveK*t)} ถ้า ${A.pri.length} หน่วยงานลดลงมาเท่าค่ากลาง</span></div>
+    <button class="kpi act warn-k" data-flag><span class="lbl">ควรตรวจสอบข้อมูล</span>
+      <span class="val">${A.flagged.length}<small>หน่วยงาน</small></span>
+      <span class="note">กดเพื่อดูรายชื่อและเหตุผล</span></button>`;
+  renderExec(A);
+}
+
+function renderExec(A){
+  const y = S.year, t = S.tariff, share = v => fmt(v/A.tot*100,1)+"%";
+  $("execYear").textContent = y;
+  const li = (title, body) => `<li><b>${title}</b><span>${body}</span></li>`;
+  const f = [];
+  f.push(li("ภาพรวมการใช้ไฟ", `ปี ${y} ใช้ไฟฟ้ารวม ${fmt(A.tot/1e6,2)} ล้าน kWh ปล่อยก๊าซเรือนกระจกประมาณ ${fmt(A.tot*EF/1000)} tCO2e คิดเป็นค่าไฟประมาณ ${baht(A.tot*t)}` + (A.ctot ? ` ${A.tot<=A.ctot?"ลดลง":"เพิ่มขึ้น"} ${fmt(Math.abs(A.tot-A.ctot)/A.ctot*100,1)}% จากปี ${A.cy} ซึ่งเป็นปีล่าสุดที่มีข้อมูล 12 เดือนเท่ากัน` : "") + (months(y)<12 ? ` (ข้อมูลไฟฟ้าปีนี้มีเพียง ${months(y)} เดือน)` : "")));
+  if (A.unmeasured.length) f.push(li(A.unK/A.tot>=0.3 ? "ไฟฟ้าราว 1 ใน 3 ยังไม่ถูกวัดด้วยตัวชี้วัดนี้" : `ไฟฟ้า ${share(A.unK)} ยังไม่ถูกวัดด้วยตัวชี้วัดนี้`, `${share(A.unK)} ของไฟฟ้าทั้งหมด (${fmt(A.unK/1e6,2)} ล้าน kWh) มาจากหน่วยที่ไม่มีรายรับแยก จึงคำนวณอัตราส่วนไม่ได้ รายใหญ่คือ ${A.unmeasured.slice(0,4).map(r=>`${esc(sName(r.u.name))} (${share(r.c.A)})`).join(", ")}`));
+  if (A.models.length) f.push(li("ต้นแบบที่ใช้ไฟคุ้มรายรับ", `${A.models.map(r=>`${esc(sName(r.u.name))} (${fmtR(r.c.r)})`).join(", ")} เป็นหน่วยงานขนาดใหญ่ที่ใช้ไฟเกิน 300,000 kWh แต่อัตราส่วนไม่เกินค่ากลาง ${fmtR(A.med)} ควรถอดบทเรียนไปใช้กับหน่วยงานอื่น`));
+  if (A.pri.length) f.push(li("หน่วยงานที่ควรเร่งมาตรการ", `${A.pri.slice(0,4).map(r=>`${esc(sName(r.u.name))} (${fmtR(r.c.r)})`).join(", ")} มีอัตราส่วนสูงกว่าค่ากลางและใช้ไฟปริมาณมาก ถ้าลดลงมาเท่าค่ากลางจะประหยัดได้ ${fmt(A.saveK/1e6,2)} ล้าน kWh ${per(y)} หรือประมาณ ${baht(A.saveK*t)}`));
+  if (A.rising.length) f.push(li("หน่วยงานที่แย่ลงจริง", `${A.rising.map(r=>`${esc(sName(r.u.name))} (${fmtR(r.pc.r)} → ${fmtR(r.c.r)})`).join(", ")} อัตราส่วนสูงขึ้นเกิน 20% จากปี ${A.cy} ซึ่งมีข้อมูล 12 เดือนเท่ากัน และสูงกว่าค่ากลาง ควรติดตามเป็นพิเศษ`));
+  if (A.flagged.length) f.push(li("ข้อมูลที่ต้องยืนยันก่อนรายงาน", `${A.flagged.length} หน่วยงานมีตัวเลขผิดปกติ ในจำนวนนี้ ${A.flagged.filter(r=>r.iss.some(x=>x.includes("รายรับ"))).length} รายเกี่ยวกับรายรับสุทธิ เช่น ${A.flagged.slice(0,3).map(r=>esc(sName(r.u.name))).join(", ")} อัตราส่วนของหน่วยงานกลุ่มนี้ยังไม่ควรใช้ประเมินผล`));
+  $("execFind").innerHTML = f.join("");
+
+  const rec = [];
+  if (A.pri.length) rec.push(li("ตั้งเป้ารายหน่วยงาน", `กำหนดเป้าให้ ${A.pri.slice(0,4).map(r=>esc(sName(r.u.name))).join(", ")} ลดอัตราส่วนลงปีละ 10–15% ด้วยมาตรการที่ไม่กระทบการเรียนการสอน เช่น ตั้งเวลาเครื่องปรับอากาศ เปลี่ยนเป็นหลอด LED และตรวจสอบเครื่องมือวิจัยที่เปิดทิ้งไว้`));
+  if (A.unmeasured.length) rec.push(li("แบ่งความรับผิดชอบไฟฟ้าส่วนกลาง", `ติดตั้งมิเตอร์ย่อยหรือกำหนดสูตรปันส่วนไฟฟ้าของ ${A.unmeasured.slice(0,3).map(r=>esc(sName(r.u.name))).join(", ")} ให้หน่วยงานผู้ใช้ เพื่อให้ตัวชี้วัดครอบคลุมไฟฟ้าทั้งหมด`));
+  rec.push(li("ใช้ตัวชี้วัดเสริม", `อัตราส่วนนี้แกว่งตามรายรับมาก (เช่น รายรับลดลงทำให้ค่าพุ่ง ทั้งที่ใช้ไฟเท่าเดิม) ควรรายงานคู่กับ kWh ต่อตารางเมตร หรือ kWh ต่อบุคลากรและนักศึกษา เพื่อแยกผลจากการประหยัดไฟจริง`));
+  $("execRec").innerHTML = rec.join("");
+
+  $("execPri").innerHTML = A.pri.length ? A.pri.map(r=>`<tr data-id="${r.u.id}" tabindex="0"><td class="uname"><span class="nm">${nameHTML(r.u.name)}</span></td><td class="num" data-label="อัตราส่วน">${fmtR(r.c.r)}</td><td class="num" data-label="ไฟฟ้า (kWh)">${fmt(r.c.A)}</td><td class="num" data-label="ลดได้ (kWh)"><b>${fmt(r.save)}</b></td><td class="num" data-label="ประหยัดประมาณ">${baht(r.save*t)}</td></tr>`).join("")
+    : `<tr><td colspan="5" style="color:var(--muted);padding:14px">ไม่มีหน่วยงานที่อัตราส่วนสูงกว่าค่ากลางในปีนี้</td></tr>`;
+}
+$("tariff").addEventListener("input", e=>{ const v=parseFloat(e.target.value.replace(/,/g,"")); if(isFinite(v)&&v>0){ S.tariff=v; renderKPIs(); } });
+$("execPri").addEventListener("click", e=>{ const tr=e.target.closest("tr[data-id]"); if(tr) pick(tr); });
+$("kpis").addEventListener("click", e=>{
+  const o = e.target.closest("[data-open]"); if (o){ pick({dataset:{id:o.dataset.open}}); return; }
+  if (e.target.closest("[data-better]")){ S.kind="better"; render(); document.querySelector(".main").scrollIntoView({behavior:"smooth",block:"start"}); return; }
+  if (e.target.closest("[data-flag]")){ S.kind="flag"; render(); document.querySelector(".main").scrollIntoView({behavior:"smooth",block:"start"}); }
+});
 
 const COLS = [
   {k:"rank",t:"#",cls:"rank"},
@@ -371,7 +555,7 @@ const COLS = [
 function rowsView(){
   const y = S.year, q = S.q.trim().toLowerCase();
   let rows = DATA.map(u => ({u, c:calc(u,y), d:delta(u,y)}))
-    .filter(r => (S.kind==="all" || r.u.kind===S.kind) && (!q || r.u.name.toLowerCase().includes(q)));
+    .filter(r => (S.kind==="all" || (S.kind==="flag" ? issues(r.u,y).length>0 : S.kind==="better" ? isBetter(r.u,y) : r.u.kind===S.kind)) && (!q || r.u.name.toLowerCase().includes(q)));
   const ok = rows.filter(r=>r.c.st==="ok"), neg = rows.filter(r=>r.c.st==="neg"), rest = rows.filter(r=>r.c.st==="noA"||r.c.st==="noB");
   const key = r => S.sort==="name"? r.u.name : S.sort==="A"? (r.c.A??-Infinity) : S.sort==="B"? (r.c.B??-Infinity) : S.sort==="delta"? (r.d??Infinity*S.dir) : r.c.r;
   const cmp = (a,b) => { const x=key(a), y2=key(b); return (typeof x==="string"? x.localeCompare(y2,"th") : x-y2)*S.dir; };
@@ -392,20 +576,21 @@ function renderTable(){
   let rank = 0;
   $("tbody").innerHTML = v.all.map(({u,c,d}) => {
     const okRow = c.st==="ok"; if (okRow) rank++;
+    const iss = issues(u,y);
     let ratio;
     if (okRow) ratio = `<div class="rbar"><div class="track"><div class="fill" style="width:${barW(c.r,ext).toFixed(1)}%"></div></div><span class="rv">${fmtR(c.r)}</span></div>`;
     else { const [cls,t]=STATUS[c.st]; ratio = `<span class="pill ${cls}" ${c.st==="neg"?`data-tip="ค่าตามสูตรใน Excel = ${fmtR(c.raw)} แต่รายรับสุทธิติดลบทำให้ตีความไม่ได้"`:""}>${t}</span>`; }
     let dd = "–";
-    if (d!=null){ const big = Math.abs(d)>100; dd = `<span class="delta ${d<0?"d-good":d>0?"d-bad":"d-flat"}">${d>0?"▲":d<0?"▼":""} ${fmt(Math.abs(d),1)}%</span>${big?` <span class="pill p-warn" data-tip="เปลี่ยนแปลงเกิน 100% ควรตรวจสอบข้อมูลรายรับหรือมิเตอร์">ตรวจสอบ</span>`:""}`; }
-    return `<tr data-id="${u.id}" class="${S.sel===u.id?"sel":""} ${okRow?"":"dim"}" tabindex="0">
+    if (d!=null){ const big = Math.abs(d)>100; dd = `<span class="delta ${d<0?"d-good":d>0?"d-bad":"d-flat"}">${d>0?"▲":d<0?"▼":""} ${fmt(Math.abs(d),1)}%</span>`; }
+    return `<tr data-id="${u.id}" class="${S.sel===u.id?"sel":""} ${okRow?"":"dim"} ${iss.length?"flagged":""}" tabindex="0">
       <td class="rank">${okRow&&S.sort==="ratio"?rank:""}</td>
-      <td class="uname"><span class="nm">${nameHTML(u.name)}</span><span class="k">${KIND_LABEL[u.kind]}</span></td>
-      <td class="num">${fmt(c.A)}</td>
-      <td class="num">${c.B==null?"–":fmt(c.B/1e6,2)}</td>
+      <td class="uname"><span class="nm">${nameHTML(u.name)}</span>${iss.length?` <span class="pill p-bad flag" data-tip="${esc(iss.join(" · "))}">⚠ ผิดปกติ ${iss.length} จุด</span>`:""}<span class="k">${KIND_LABEL[u.kind]}</span></td>
+      <td class="num c-a" data-label="ไฟฟ้า (kWh)">${fmt(c.A)}</td>
+      <td class="num c-b" data-label="รายรับ (ล้าน)">${c.B==null?"–":fmt(c.B/1e6,2)}</td>
       <td class="ratio-cell">${ratio}</td>
-      <td class="num">${dd}</td></tr>`;
+      <td class="num c-d" data-label="เทียบปีก่อน">${dd}</td></tr>`;
   }).join("") || `<tr><td colspan="6" style="padding:24px;text-align:center;color:var(--muted)">ไม่พบหน่วยงานที่ตรงกับ “${esc(S.q)}”</td></tr>`;
-  $("count").textContent = `แสดง ${v.all.length} หน่วยงาน · ซ่อน ${v.rest.length} หน่วยงานที่ไม่มีข้อมูลรายรับหรือไฟฟ้าในปี ${y} · ${S.scale==="log"?"ความยาวแท่งใช้สเกล log เพราะค่าห่างกันหลายเท่า":"ความยาวแท่งใช้สเกลเชิงเส้น"}`;
+
   $("tblTitle").textContent = `อันดับหน่วยงาน ปี ${y}`;
 }
 
@@ -460,6 +645,7 @@ function renderDetail(){
       <h2>${nameHTML(u.name)}</h2>
     </div>
     ${head}
+    ${(()=>{ const iss=issues(u,y); return iss.length?`<div class="msg p-bad"><b>⚠ ข้อมูลผิดปกติ ควรตรวจสอบก่อนนำไปใช้</b><ul style="margin:6px 0 0;padding-left:18px">${iss.map(x=>`<li>${esc(x)}</li>`).join("")}</ul></div>`:""; })()}
     ${d!=null?`<div class="period"><span class="delta ${d<0?"d-good":"d-bad"}">${d<0?"▼ ลดลง":"▲ เพิ่มขึ้น"} ${fmt(Math.abs(d),1)}%</span> จากปี ${p} (${fmtR(calc(u,p).r)})</div>`:""}
     <dl class="dl">
       <dt>A · หน่วยการใช้ไฟฟ้า</dt><dd>${fmt(c.A)} kWh</dd>
@@ -473,17 +659,24 @@ function renderDetail(){
 }
 
 function renderSegs(){
-  const opts = [["all","ทั้งหมด"],["unit","คณะ/สำนัก"]];
+  const nFlag = DATA.filter(u=>issues(u,S.year).length).length;
+  const nBetter = DATA.filter(u=>isBetter(u,S.year)).length;
+  const opts = [["all","ทั้งหมด"],["better",`▼ ดีขึ้น (${nBetter})`],["flag",`⚠ ผิดปกติ (${nFlag})`]];
   $("kindSeg").innerHTML = opts.map(([v,t])=>`<button data-v="${v}" aria-pressed="${S.kind===v}">${t}</button>`).join("");
   [...$("scaleSeg").children].forEach(b=>b.setAttribute("aria-pressed", b.dataset.v===S.scale));
+  const lab = Object.fromEntries(opts)[S.kind] || "ทั้งหมด";
+  $("toolsSum").textContent = `ตัวกรอง: ${lab}${S.q.trim()?` · “${S.q.trim()}”`:""}`;
+  const sv = `${S.sort}:${S.dir}`; if ([...$("sortSel").options].some(o=>o.value===sv)) $("sortSel").value = sv;
 }
+$("toolsToggle").addEventListener("click", ()=>{ const o = $("tools").classList.toggle("open"); $("toolsToggle").setAttribute("aria-expanded", o); });
+$("sortSel").addEventListener("change", e=>{ const [k,d]=e.target.value.split(":"); S.sort=k; S.dir=+d; renderTable(); });
 function render(){ renderYears(); renderKPIs(); renderSegs(); renderTable(); renderDetail(); $("srcLine").textContent = SRC + " · ไฟฟ้าปี 2567–2568 เป็นข้อมูล ม.ค.–ก.ย. ตามไฟล์ต้นฉบับ"; }
 
 /* events */
 $("years").addEventListener("click", e=>{ const b=e.target.closest("button"); if(b){ S.year=b.dataset.y; render(); }});
 $("kindSeg").addEventListener("click", e=>{ const b=e.target.closest("button"); if(b){ S.kind=b.dataset.v; render(); }});
 $("scaleSeg").addEventListener("click", e=>{ const b=e.target.closest("button"); if(b){ S.scale=b.dataset.v; renderSegs(); renderTable(); }});
-$("q").addEventListener("input", e=>{ S.q=e.target.value; renderTable(); });
+$("q").addEventListener("input", e=>{ S.q=e.target.value; renderTable(); renderSegs(); });
 $("thead").addEventListener("click", e=>{ const th=e.target.closest("th[data-k]"); if(!th) return; const k=th.dataset.k;
   if (S.sort===k) S.dir*=-1; else { S.sort=k; S.dir = (k==="A"||k==="B")?-1:1; } renderTable(); });
 let lastRow = null;
@@ -498,8 +691,8 @@ $("tbody").addEventListener("keydown", e=>{ if(e.key==="Enter"||e.key===" "){ e.
 
 $("copyBtn").addEventListener("click", async ()=>{
   const y=S.year, v=rowsView();
-  const lines=[["หน่วยงาน","ประเภท",`ไฟฟ้า A (kWh) ${y}`,`รายรับสุทธิ B (บาท) ${y}`,"อัตราส่วน (A/B)*1000","สถานะ","เปลี่ยนแปลงจากปีก่อน (%)"].join("\t")];
-  v.all.forEach(({u,c,d})=>lines.push([u.name,KIND_LABEL[u.kind],c.A??"",c.B??"",c.st==="ok"?c.r.toFixed(4):"",c.st==="ok"?"คำนวณได้":STATUS[c.st][1],d==null?"":d.toFixed(1)].join("\t")));
+  const lines=[["หน่วยงาน","ประเภท",`ไฟฟ้า A (kWh) ${y}`,`รายรับสุทธิ B (บาท) ${y}`,"อัตราส่วน (A/B)*1000","สถานะ","เปลี่ยนแปลงจากปีก่อน (%)","ความผิดปกติ"].join("\t")];
+  v.all.forEach(({u,c,d})=>lines.push([u.name,KIND_LABEL[u.kind],c.A??"",c.B??"",c.st==="ok"?c.r.toFixed(4):"",c.st==="ok"?"คำนวณได้":STATUS[c.st][1],d==null?"":d.toFixed(1),issues(u,y).join("; ")].join("\t")));
   const text=lines.join("\n"), btn=$("copyBtn");
   try { await navigator.clipboard.writeText(text); btn.textContent="คัดลอกแล้ว"; }
   catch { const ta=document.createElement("textarea"); ta.value=text; document.body.appendChild(ta); ta.select(); try{document.execCommand("copy"); btn.textContent="คัดลอกแล้ว";}catch{btn.textContent="คัดลอกไม่สำเร็จ";} ta.remove(); }
