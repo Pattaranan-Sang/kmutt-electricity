@@ -1,0 +1,580 @@
+<title>ดัชนีไฟฟ้าต่อรายรับ มจธ.</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Google+Sans+Flex:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: control bar → KPI strip → ranked table (left) + unit detail (right) → method, calculator, import */
+:root{
+  --bg:#F5F7FB; --surface:#FFFFFF; --sunk:#EEF2F8; --ink:#0B2545; --ink-2:#44587A; --muted:#7A89A3; --line:#DCE3EE;
+  --accent:#F26B1D; --accent-soft:#FDEBDF; --bar:#1C3F75; --bar-soft:#C9D6EA;
+  --navy:#0B2545; --on-navy:#FFFFFF; --on-navy-2:#B9C6DB; --chip:#FFFFFF; --chip-2:#6A7A95;
+  --good:#1D8456; --good-soft:#DDF2E7; --bad:#C5302B; --bad-soft:#FBE1DF; --warn:#9A6A10; --warn-soft:#F7EDD3; --idle:#E8EDF5;
+  --f-display:"Google Sans Flex","Google Sans","Noto Sans Thai",system-ui,sans-serif;
+  --f-body:"Google Sans Flex","Google Sans","Noto Sans Thai",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --r:10px;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#081426; --surface:#0F2038; --sunk:#0B1A2F; --ink:#E9EEF6; --ink-2:#A9B7CC; --muted:#7D8DA6; --line:#1F3352;
+  --accent:#FF8A3D; --accent-soft:#3B2213; --bar:#7FA4DE; --bar-soft:#22395C;
+  --navy:#102C55; --on-navy:#FFFFFF; --on-navy-2:#AFC0DA; --chip:#FFFFFF; --chip-2:#6A7A95;
+  --good:#4CC48B; --good-soft:#123326; --bad:#F06C60; --bad-soft:#3A1A17; --warn:#E3B24C; --warn-soft:#352A12; --idle:#18294A; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#081426; --surface:#0F2038; --sunk:#0B1A2F; --ink:#E9EEF6; --ink-2:#A9B7CC; --muted:#7D8DA6; --line:#1F3352;
+  --accent:#FF8A3D; --accent-soft:#3B2213; --bar:#7FA4DE; --bar-soft:#22395C;
+  --navy:#102C55; --on-navy:#FFFFFF; --on-navy-2:#AFC0DA; --chip:#FFFFFF; --chip-2:#6A7A95;
+  --good:#4CC48B; --good-soft:#123326; --bad:#F06C60; --bad-soft:#3A1A17; --warn:#E3B24C; --warn-soft:#352A12; --idle:#18294A; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.55;font-variant-numeric:tabular-nums}
+.wrap{max-width:1280px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 56px;display:grid;gap:20px}
+h1,h2,h3{font-family:var(--f-display);text-wrap:balance;margin:0;line-height:1.25}
+h1{font-size:clamp(1.5rem,2.6vw,2.05rem);font-weight:700}
+h2{font-size:1.2rem;font-weight:600}
+h3{font-size:1rem;font-weight:600}
+.eyebrow{font-size:.78rem;letter-spacing:.06em;color:var(--accent);font-weight:600}
+.sub{color:var(--ink-2);margin:6px 0 0;max-width:68ch}
+button,input,select{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+/* header */
+.top{display:flex;flex-wrap:wrap;gap:16px 28px;align-items:flex-end;justify-content:space-between}
+.top>div{min-width:0}
+.years{display:flex;gap:4px;background:var(--sunk);border:1px solid var(--line);border-radius:999px;padding:4px;flex-wrap:wrap}
+.years button{border:0;background:transparent;border-radius:999px;padding:6px 14px;cursor:pointer;display:grid;line-height:1.2;text-align:center}
+.years button small{font-size:.68rem;color:var(--muted)}
+.years button b{font-family:var(--f-display);font-size:1rem}
+.years button[aria-pressed="true"]{background:var(--surface);box-shadow:0 1px 3px rgb(0 0 0/.12)}
+.years button[aria-pressed="true"] b{color:var(--accent)}
+.period{font-size:.85rem;color:var(--ink-2);display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.top{background:var(--navy);color:var(--on-navy);border-radius:14px;padding:24px 26px;border-bottom:4px solid var(--accent)}
+@media (max-width:600px){.top{padding:18px}}
+.top h1{color:var(--on-navy)}
+.top .sub{color:var(--on-navy-2)}
+.top .years{background:rgb(255 255 255/.08);border-color:rgb(255 255 255/.18)}
+.top .years button{color:var(--on-navy)}
+.top .years button small{color:var(--on-navy-2)}
+.top .years button[aria-pressed="true"]{background:var(--chip)}
+.top .years button[aria-pressed="true"] small{color:var(--chip-2)}
+.top .period{color:var(--on-navy-2)}
+.top .period b{color:var(--on-navy)}
+
+/* KPI */
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px}
+.kpi{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px 16px;display:grid;gap:2px;align-content:start}
+.kpi .lbl{font-size:.8rem;color:var(--ink-2)}
+.kpi .val{font-family:var(--f-display);font-size:1.6rem;font-weight:600;line-height:1.2}
+.kpi .val small{font-size:.8rem;font-weight:500;color:var(--muted);margin-left:4px;font-family:var(--f-body)}
+.kpi .note{font-size:.78rem;color:var(--muted)}
+
+/* pills */
+.pill{display:inline-flex;align-items:center;gap:4px;font-size:.72rem;font-weight:600;border-radius:999px;padding:1px 8px;white-space:nowrap;line-height:1.6}
+.p-good{background:var(--good-soft);color:var(--good)}
+.p-bad{background:var(--bad-soft);color:var(--bad)}
+.p-warn{background:var(--warn-soft);color:var(--warn)}
+.p-idle{background:var(--idle);color:var(--ink-2)}
+.p-acc{background:var(--accent-soft);color:var(--accent)}
+
+/* main grid */
+.main{display:grid;grid-template-columns:minmax(0,1fr);gap:20px;align-items:start}
+@media (max-width:1020px){.main{grid-template-columns:minmax(0,1fr)}}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);min-width:0}
+.panel-h{padding:14px 16px;border-bottom:1px solid var(--line);display:flex;flex-wrap:wrap;gap:10px 14px;align-items:center;justify-content:space-between}
+.tools{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.search{border:1px solid var(--line);background:var(--bg);border-radius:8px;padding:6px 10px;width:220px;max-width:100%}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.seg button{border:0;background:var(--surface);padding:5px 10px;cursor:pointer;font-size:.82rem;color:var(--ink-2)}
+.seg button+button{border-left:1px solid var(--line)}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--surface)}
+.btn{border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:6px 12px;cursor:pointer;font-size:.85rem}
+.btn:hover{border-color:var(--ink-2)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+
+.tbl-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:.88rem}
+th{font-size:.75rem;font-weight:600;color:var(--ink-2);text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);white-space:nowrap;background:var(--surface);position:sticky;top:0}
+th.sortable{cursor:pointer;user-select:none}
+th.sortable:hover{color:var(--ink)}
+th .arr{color:var(--accent)}
+td{padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:middle}
+td.num,th.num{text-align:right;white-space:nowrap}
+tbody tr{cursor:pointer}
+tbody tr:hover{background:var(--sunk)}
+tbody tr.sel{background:var(--accent-soft)}
+tbody tr.dim td{color:var(--muted)}
+.rank{color:var(--muted);font-size:.78rem;width:28px}
+.uname{font-weight:500;min-width:180px}
+.nm{text-decoration:underline dotted var(--muted);text-underline-offset:4px}
+tbody tr:hover .nm{color:var(--accent);text-decoration-color:var(--accent)}
+.modal{position:fixed;inset:0;z-index:40;display:grid;place-items:center;padding-block:max(16px,env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-bottom,0px));padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+[hidden],.modal[hidden]{display:none!important}
+.backdrop{position:absolute;inset:0;background:rgb(6 12 16/.55)}
+.modal .detail{position:relative;top:auto;width:min(460px,100%);max-height:100%;overflow:auto;box-shadow:0 20px 50px rgb(0 0 0/.3)}
+.x{position:absolute;top:10px;right:10px;width:34px;height:34px;border-radius:999px;border:1px solid var(--line);background:var(--surface);cursor:pointer;font-size:1rem;line-height:1;color:var(--ink-2)}
+.x:hover{color:var(--ink);border-color:var(--ink-2)}
+body.locked{overflow:hidden}
+.code{font-family:var(--f-display);font-weight:700;color:var(--accent);margin-right:2px}
+.uname .k{display:block;font-size:.72rem;color:var(--muted);font-weight:400}
+.ratio-cell{min-width:220px;background:var(--accent-soft)}
+th.hl{background:var(--accent);color:var(--on-navy);font-size:.8rem}
+th.hl .arr{color:var(--on-navy)}
+.rbar{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center}
+.ratio-cell .track{background:var(--surface)}
+.ratio-cell .fill{background:var(--accent)}
+tr.sel .ratio-cell .fill{background:var(--navy)}
+.track{height:10px;background:var(--sunk);border-radius:4px;overflow:hidden}
+.fill{height:100%;background:var(--bar);border-radius:0 4px 4px 0}
+tr.sel .fill{background:var(--accent)}
+.rv{font-weight:700;font-size:1.05rem;background:var(--navy);color:var(--on-navy);border-radius:6px;padding:2px 10px;min-width:66px;text-align:center}
+.delta{font-size:.8rem;font-weight:600}
+.d-good{color:var(--good)} .d-bad{color:var(--bad)} .d-flat{color:var(--muted)}
+.foot{padding:10px 16px;font-size:.78rem;color:var(--muted);display:flex;flex-wrap:wrap;gap:6px 16px;justify-content:space-between}
+
+/* detail */
+.detail{position:sticky;top:calc(env(safe-area-inset-top,0px) + 12px);padding:18px;display:grid;gap:16px}
+@media (max-width:1020px){.detail{position:static}}
+.big{font-family:var(--f-display);font-size:2.6rem;font-weight:700;line-height:1;color:var(--ink)}
+.big small{font-size:.85rem;font-weight:500;color:var(--muted);font-family:var(--f-body);margin-left:6px}
+.dl{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;font-size:.86rem;margin:0}
+.dl dt{color:var(--ink-2)} .dl dd{margin:0;text-align:right;font-weight:500}
+.formula{background:var(--sunk);border-radius:8px;padding:10px 12px;font-size:.84rem;color:var(--ink-2)}
+.formula b{color:var(--ink)}
+.chart svg{width:100%;height:auto;display:block;overflow:visible}
+.chart .cap{font-size:.78rem;color:var(--ink-2);margin-bottom:4px;display:flex;justify-content:space-between;gap:8px}
+.ax{fill:var(--muted);font-size:10px;font-family:var(--f-body)}
+.gl{stroke:var(--line);stroke-width:1}
+.msg{font-size:.84rem;border-radius:8px;padding:10px 12px}
+
+/* lower sections */
+.lower{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px;align-items:start}
+.sec{padding:18px;display:grid;gap:12px}
+.sec p{margin:0;color:var(--ink-2);font-size:.9rem}
+.mt{width:100%;font-size:.86rem}
+.mt th{position:static;width:34%;vertical-align:top;white-space:normal;background:var(--sunk);color:var(--ink)}
+.mt td{color:var(--ink-2)}
+.red{color:var(--bad);font-weight:600}
+.field{display:grid;gap:4px}
+.field label{font-size:.8rem;color:var(--ink-2)}
+.field input{border:1px solid var(--line);background:var(--bg);border-radius:8px;padding:8px 10px;text-align:right;width:100%}
+.calc-out{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px}
+.calc-out div{background:var(--sunk);border-radius:8px;padding:10px 12px}
+.calc-out span{display:block;font-size:.75rem;color:var(--ink-2)}
+.calc-out b{font-family:var(--f-display);font-size:1.3rem}
+.drop{border:1.5px dashed var(--line);border-radius:var(--r);padding:18px;text-align:center;display:grid;gap:8px;justify-items:center;color:var(--ink-2);font-size:.88rem}
+.drop.over{border-color:var(--accent);background:var(--accent-soft)}
+.src{font-size:.78rem;color:var(--muted)}
+#tip{position:fixed;pointer-events:none;background:var(--ink);color:var(--bg);font-size:.78rem;padding:6px 9px;border-radius:6px;z-index:50;max-width:240px;line-height:1.4}
+@media (prefers-reduced-motion:no-preference){.fill{transition:width .35s ease}}
+</style>
+<div class="wrap">
+  <header class="top">
+    <div>
+      <div class="eyebrow">KMUTT Sustainability · ตัวชี้วัดประสิทธิภาพการใช้ไฟฟ้า</div>
+      <h1>ดัชนีไฟฟ้าต่อรายรับ มจธ.</h1>
+      <p class="sub">หน่วยการใช้ไฟฟ้า (kWh) ต่อรายรับสุทธิ 1,000 บาท ของแต่ละหน่วยงาน ยิ่งค่าต่ำ ยิ่งใช้ไฟฟ้าอย่างมีประสิทธิภาพเมื่อเทียบกับรายรับ</p>
+    </div>
+    <div style="display:grid;gap:8px;justify-items:end">
+      <div class="years" id="years" role="group" aria-label="เลือกปี"></div>
+      <div class="period" id="period"></div>
+    </div>
+  </header>
+
+  <section class="kpis" id="kpis" aria-label="สรุปภาพรวม"></section>
+
+  <div class="main">
+    <section class="panel" aria-label="อันดับหน่วยงาน">
+      <div class="panel-h">
+        <h2 id="tblTitle">อันดับหน่วยงาน</h2>
+        <div class="tools">
+          <input class="search" id="q" type="search" placeholder="ค้นหาหน่วยงาน…" aria-label="ค้นหาหน่วยงาน">
+          <div class="seg" id="kindSeg" role="group" aria-label="ประเภท"></div>
+          <div class="seg" id="scaleSeg" role="group" aria-label="สเกลแท่ง">
+            <button data-v="log" aria-pressed="true" title="สเกลลอการิทึม เหมาะเมื่อค่าห่างกันมาก">Log</button>
+            <button data-v="lin" aria-pressed="false" title="สเกลเชิงเส้น">เชิงเส้น</button>
+          </div>
+        </div>
+      </div>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr id="thead"></tr></thead>
+          <tbody id="tbody"></tbody>
+        </table>
+      </div>
+      <div class="foot">
+        <span id="count"></span>
+        <span><button class="btn" id="copyBtn">คัดลอกตาราง (วางใน Excel ได้)</button></span>
+      </div>
+    </section>
+
+    
+  </div>
+
+  <div class="lower">
+    <section class="panel sec" aria-labelledby="mh">
+      <h2 id="mh">นิยามตัวชี้วัด</h2>
+      <table class="mt">
+        <tr><th>สูตรการคำนวณ</th><td>อัตราส่วนหน่วยการใช้ไฟฟ้าต่อรายรับสุทธิของหน่วยงาน (เพิ่มประสิทธิภาพการใช้ไฟ โดยไม่ลดคุณภาพทางวิชาการ)<br><b style="color:var(--ink)">= (A ÷ B) × 1,000</b></td></tr>
+        <tr><th>หน่วยนับ</th><td>อัตราส่วน (หน่วยการใช้ไฟฟ้าต่อรายได้ 1,000 บาท)</td></tr>
+        <tr><th>นิยาม</th><td><b>A</b> คือ <span class="red">หน่วยการใช้ไฟฟ้าของหน่วยงาน</span><br><b>B</b> คือ <span class="red">รายรับสุทธิของหน่วยงาน (รายรับทั้งหมดของหน่วยงาน ไม่รวมงบลงทุน − รายจ่ายภายใน)</span></td></tr>
+        <tr><th>ข้อมูลในการคำนวณ</th><td>1. ข้อมูลการใช้ไฟฟ้า จากสำนักบริหารอาคารและสถานที่ (BGM)<br>2. รายรับสุทธิของหน่วยงาน</td></tr>
+        <tr><th>ผู้กำกับตัวชี้วัด</th><td>คณะกรรมการ มจธ. เพื่อการพัฒนาที่ยั่งยืน (KMUTT Sustainability Committee)</td></tr>
+        <tr><th>ผู้สนับสนุนข้อมูล</th><td>1. คณะ สำนัก สถาบัน<br>2. สำนักบริหารอาคารและสถานที่ (BGM)</td></tr>
+        <tr><th>ผู้รายงานข้อมูล</th><td>คณะอนุกรรมการส่งเสริมและประเมินผลการปล่อยคาร์บอนสุทธิเป็นศูนย์ (Subcommittee on Promotion and Evaluation for KMUTT Carbon Neutrality 2040)</td></tr>
+        <tr><th>รอบการรายงาน</th><td>ปีละ 1 ครั้ง เก็บข้อมูลและรายงานผลทุกสิ้นปีปฏิทิน เดือนมกราคม – ธันวาคมของทุกปี</td></tr>
+      </table>
+      <p class="src">ค่าการปล่อยก๊าซเรือนกระจกจากไฟฟ้า 0.4999 kgCO2e/kWh (องค์การบริหารจัดการก๊าซเรือนกระจก) · “ส่วนกลาง” หมายถึง งบสมทบสาธารณูปโภคส่วนกลาง</p>
+    </section>
+
+    <section class="panel sec" aria-labelledby="ch">
+      <h2 id="ch">เครื่องคำนวณ</h2>
+      <p>กรอกตัวเลขของหน่วยงานเพื่อคำนวณตามสูตรในคู่มือ</p>
+      <div class="field"><label for="cA">A · หน่วยการใช้ไฟฟ้า (kWh)</label><input id="cA" inputmode="decimal" value="1,000,000"></div>
+      <div class="field"><label for="cInc">รายรับทั้งหมด ไม่รวมงบลงทุน (บาท)</label><input id="cInc" inputmode="decimal" value="350,000,000"></div>
+      <div class="field"><label for="cExp">รายจ่ายภายใน (บาท)</label><input id="cExp" inputmode="decimal" value="50,000,000"></div>
+      <div class="calc-out" id="calcOut"></div>
+    </section>
+
+    <section class="panel sec" aria-labelledby="ih">
+      <h2 id="ih">อัปเดตข้อมูลจาก Excel</h2>
+      <p>อัปโหลดไฟล์ Excel รูปแบบเดียวกับต้นฉบับ (ชีต “ปริมาณไฟฟ้า”) ระบบจะอ่านคอลัมน์ปริมาณไฟฟ้าและรายรับตามหัวคอลัมน์ปี แล้วคำนวณใหม่ทันที ไฟล์ถูกอ่านในเบราว์เซอร์นี้เท่านั้น ไม่ถูกส่งไปที่ใด</p>
+      <label class="drop" id="drop" for="file">
+        <span>ลากไฟล์ .xlsx มาวาง หรือ</span>
+        <span class="btn primary">เลือกไฟล์</span>
+        <input id="file" type="file" accept=".xlsx,.xls" hidden>
+      </label>
+      <div id="importMsg"></div>
+      <div><button class="btn" id="resetBtn" hidden>กลับไปใช้ข้อมูลเดิม</button></div>
+    </section>
+  </div>
+  <p class="src" id="srcLine"></p>
+</div>
+<div class="modal" id="modal" hidden><div class="backdrop" data-close></div><aside class="panel detail" id="detail" role="dialog" aria-modal="true" aria-label="รายละเอียดหน่วยงาน"></aside></div>
+<div id="tip" hidden></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script>
+const ORIGINAL = [{"id":1,"name":"คณะวิศวฯ","group":1,"kwh":{"2565":1885500.07,"2566":1666282.54,"2567":1913271.35,"2568":2019720.38,"2569":2231507.81},"inc":{"2565":null,"2566":564695830.95,"2567":610215969.91,"2568":560150883.97,"2569":771723880.04},"xl":{"2566":2.95,"2567":3.14,"2568":3.61,"2569":2.89}},{"id":2,"name":"คณะครุศาสตร์","group":5,"kwh":{"2565":554908.2,"2566":643284.05,"2567":810548.5,"2568":811771.3,"2569":866130.6},"inc":{"2565":null,"2566":181166148.52,"2567":201897350.52,"2568":194102850.13,"2569":179003841.29},"xl":{"2566":3.55,"2567":4.01,"2568":4.18,"2569":4.84}},{"id":3,"name":"คณะวิทยาศาสตร์ (รวม Learning Space)","group":2,"kwh":{"2565":1614168.3,"2566":1589911.97,"2567":1582490.15,"2568":1621995.16,"2569":2121312.51},"inc":{"2565":null,"2566":195605934.35,"2567":230426950.21,"2568":242284370.87,"2569":156432513.93},"xl":{"2566":8.13,"2567":6.87,"2568":6.69,"2569":13.56}},{"id":4,"name":"Learning Space คณะวิทยาศาสตร์","group":2,"kwh":{"2565":45310.56,"2566":21054.23,"2567":13632.41,"2568":53137.42,"2569":58082.41},"inc":{"2565":null,"2566":0.0,"2567":0.0,"2568":0.0,"2569":0.0},"xl":{"2566":null,"2567":null,"2568":null,"2569":null}},{"id":5,"name":"คณะพลังงานและวัสดุ","group":7,"kwh":{"2565":398128.1,"2566":271187.13,"2567":287127.43,"2568":354937.5,"2569":349735.1},"inc":{"2565":null,"2566":75047851.51,"2567":49619288.43,"2568":61306067.05,"2569":60893790.44},"xl":{"2566":3.61,"2567":5.79,"2568":5.79,"2569":5.74}},{"id":6,"name":"คณะทรัพยากรชีวภาพฯ","group":6,"kwh":{"2565":722200.6,"2566":815675.33,"2567":788472.09,"2568":599160.84,"2569":842713.23},"inc":{"2565":null,"2566":18936679.23,"2567":17442786.28,"2568":22480456.6,"2569":32194791.43},"xl":{"2566":43.07,"2567":45.2,"2568":26.65,"2569":26.18}},{"id":7,"name":"คณะเทคโนโลยีสารสนเทศ (รวม LX)","group":4,"kwh":{"2565":602598.01,"2566":593657.35,"2567":592226.68,"2568":595610.09,"2569":643894.68},"inc":{"2565":null,"2566":142614949.11,"2567":99147259.72,"2568":100150964.69,"2569":139538795.81},"xl":{"2566":4.16,"2567":5.97,"2568":5.95,"2569":4.61}},{"id":8,"name":"คณะเทคโนโลยีสารสนเทศ (LX)","group":4,"kwh":{"2565":146688.07,"2566":137747.41,"2567":136316.74,"2568":139700.15,"2569":82752.91},"inc":{"2565":null,"2566":0.0,"2567":0.0,"2568":0.0,"2569":0.0},"xl":{"2566":null,"2567":null,"2568":null,"2569":null}},{"id":9,"name":"คณะศิลปศาสตร์","group":3,"kwh":{"2565":179773.51,"2566":265680.5,"2567":320312.92,"2568":315716.3,"2569":345767.1},"inc":{"2565":null,"2566":27453225.31,"2567":21434672.48,"2568":-7649166.5,"2569":24399408.21},"xl":{"2566":9.68,"2567":14.94,"2568":-41.27,"2569":14.17}},{"id":10,"name":"สำนักหอสมุด","group":17,"kwh":{"2565":1097085.07,"2566":1063365.0,"2567":1051607.72,"2568":859946.42,"2569":1411237.71},"inc":{"2565":null,"2566":40778208.0,"2567":31944699.88,"2568":11862863.2,"2569":3807870.48},"xl":{"2566":26.08,"2567":32.92,"2568":72.49,"2569":370.61}},{"id":11,"name":"สำนักหอสมุด (LX)","group":17,"kwh":{"2565":280766.82,"2566":247046.75,"2567":235289.47,"2568":43628.17,"2569":219810.01},"inc":{"2565":null,"2566":0.0,"2567":0.0,"2568":0.0,"2569":0.0},"xl":{"2566":null,"2567":null,"2568":null,"2569":null}},{"id":12,"name":"เทคโนโลยีมิเดียและศิลป์ประยุกต์","group":8.2,"kwh":{"2565":177401.7,"2566":262951.8,"2567":318734.3,"2568":345645.8,"2569":377053.4},"inc":{"2565":null,"2566":47935280.78,"2567":56911272.38,"2568":55288577.04,"2569":83122019.43},"xl":{"2566":5.49,"2567":5.6,"2568":6.25,"2569":4.54}},{"id":13,"name":"มจธ.บางขุนเทียน","group":20,"kwh":{"2565":1596344.8,"2566":1798831.0,"2567":2001213.0,"2568":2229324.1,"2569":1718544.6},"inc":{"2565":null,"2566":20728737.94,"2567":-7637124.84,"2568":20083115.62,"2569":null},"xl":{"2566":86.78,"2567":-262.04,"2568":111.0,"2569":null}},{"id":14,"name":"ส่วนกลาง","group":20,"kwh":{"2565":5129394.68,"2566":8573023.06,"2567":7984176.03,"2568":7889412.79,"2569":8054134.5},"inc":{"2565":null,"2566":8056987.75,"2567":8060744.23,"2568":6406836.0,"2569":2211242301.27},"xl":{"2566":1064.05,"2567":990.5,"2568":1231.41,"2569":3.64}},{"id":15,"name":"JGSEE","group":22,"kwh":{"2565":63420.49,"2566":71244.61,"2567":83966.74,"2568":105740.91,"2569":129566.0},"inc":{"2565":null,"2566":0.0,"2567":0.0,"2568":0.0,"2569":0.0},"xl":{"2566":null,"2567":null,"2568":null,"2569":null}},{"id":16,"name":"คณะสถาปัตยกรรมศาสตร์","group":8.1,"kwh":{"2565":240651.9,"2566":422453.7,"2567":451046.1,"2568":426261.5,"2569":455010.2},"inc":{"2565":null,"2566":106063771.92,"2567":117951923.08,"2568":100041067.24,"2569":115737757.55},"xl":{"2566":3.98,"2567":3.82,"2568":4.26,"2569":3.93}},{"id":17,"name":"BRI","group":14,"kwh":{"2565":2896674.6,"2566":2931631.9,"2567":3182004.0,"2568":2982284.9,"2569":2655606.3},"inc":{"2565":null,"2566":0.0,"2567":0.0,"2568":0.0,"2569":0.0},"xl":{"2566":null,"2567":null,"2568":null,"2569":null}},{"id":18,"name":"FIBO","group":10,"kwh":{"2565":668618.38,"2566":626427.21,"2567":745433.69,"2568":830088.8,"2569":910524.7},"inc":{"2565":null,"2566":88389002.62,"2567":90113154.78,"2568":90150695.84,"2569":86949477.96},"xl":{"2566":7.09,"2567":8.27,"2568":9.21,"2569":10.47}},{"id":19,"name":"สำนักบริหารอาคารและสถานที่","group":19,"kwh":{"2565":182468.85,"2566":146951.22,"2567":162032.7,"2568":166459.01,"2569":154923.3},"inc":{"2565":null,"2566":80230651.5,"2567":57994641.12,"2568":66399815.72,"2569":1344742.3},"xl":{"2566":1.83,"2567":2.79,"2568":2.51,"2569":115.21}},{"id":20,"name":"สำนักอุทยานวิทยาศาสตร์และอุตสาหกรรม (สออ.)","group":14,"kwh":{"2565":330716.2,"2566":268497.8,"2567":316592.1,"2568":248595.2,"2569":294735.6},"inc":{"2565":null,"2566":23393337.96,"2567":19228732.61,"2568":27959123.98,"2569":31994037.29},"xl":{"2566":11.48,"2567":16.46,"2568":8.89,"2569":9.21}},{"id":21,"name":"สำนักงานวิจัย นวัตกรรมและพันธมิตร","group":20,"kwh":{"2565":72918.33,"2566":90300.44,"2567":79271.54,"2568":52206.56,"2569":62538.88},"inc":{"2565":null,"2566":-1657127.81,"2567":-1382386.64,"2568":3741269.6,"2569":null},"xl":{"2566":-54.49,"2567":-57.34,"2568":13.95,"2569":null}},{"id":22,"name":"KINGEN (NBF)","group":24,"kwh":{"2565":4106997.4,"2566":1994555.2,"2567":945568.8,"2568":454522.5,"2569":475206.8},"inc":{"2565":null,"2566":0.0,"2567":0.0,"2568":0.0,"2569":null},"xl":{"2566":null,"2567":null,"2568":null,"2569":null}},{"id":23,"name":"ภาควิชาวิศวฯไฟฟ้า","group":1,"kwh":{"2565":156681.01,"2566":113594.46,"2567":158660.1,"2568":155911.0,"2569":183232.35},"inc":{"2565":null,"2566":48560653.71,"2567":44475499.04,"2568":58276590.38,"2569":null},"xl":{"2566":2.34,"2567":3.57,"2568":2.68,"2569":null}},{"id":24,"name":"ภาควิชาวิศวฯอิเล็กฯ","group":1,"kwh":{"2565":87686.38,"2566":84341.7,"2567":131058.46,"2568":74081.98,"2569":94040.57},"inc":{"2565":null,"2566":33460850.08,"2567":35118992.24,"2568":37366628.53,"2569":null},"xl":{"2566":2.52,"2567":3.73,"2568":1.98,"2569":null}},{"id":25,"name":"ภาควิชาวิศวฯคอมพิวเตอร์","group":1,"kwh":{"2565":271264.54,"2566":192102.11,"2567":318045.74,"2568":381840.2,"2569":412232.6},"inc":{"2565":null,"2566":104502263.43,"2567":106367722.71,"2568":85553208.94,"2569":null},"xl":{"2566":1.84,"2567":2.99,"2568":4.46,"2569":null}},{"id":26,"name":"ภาควิชาวิศวฯระบบ","group":1,"kwh":{"2565":66867.03,"2566":80200.17,"2567":64102.37,"2568":75267.2,"2569":109077.9},"inc":{"2565":null,"2566":29225782.89,"2567":44980793.64,"2568":37152906.56,"2569":null},"xl":{"2566":2.74,"2567":1.43,"2568":2.03,"2569":null}},{"id":27,"name":"ภาควิชาวิศวฯเครื่องกล","group":1,"kwh":{"2565":495193.2,"2566":439431.81,"2567":466272.07,"2568":396383.9,"2569":462362.2},"inc":{"2565":null,"2566":55946437.28,"2567":71355918.1,"2568":66315894.16,"2569":null},"xl":{"2566":7.85,"2567":6.53,"2568":5.98,"2569":null}},{"id":28,"name":"ภาควิชาวิศวฯโยธา","group":1,"kwh":{"2565":137859.4,"2566":110564.9,"2567":152800.26,"2568":158676.62,"2569":165442.17},"inc":{"2565":null,"2566":74708360.26,"2567":71709426.9,"2568":71583705.42,"2569":null},"xl":{"2566":1.48,"2567":2.13,"2568":2.22,"2569":null}},{"id":29,"name":"ภาควิชาวิศวฯสิ่งแวดล้อม","group":1,"kwh":{"2565":123543.58,"2566":93518.55,"2567":104836.38,"2568":88193.77,"2569":86333.94},"inc":{"2565":null,"2566":19208613.21,"2567":14438053.14,"2568":13780310.24,"2569":null},"xl":{"2566":4.87,"2567":7.26,"2568":6.4,"2569":null}},{"id":30,"name":"ภาควิชาวิศวฯอุตสาหการ","group":1,"kwh":{"2565":141469.23,"2566":164284.59,"2567":250755.7,"2568":176539.07,"2569":180669.75},"inc":{"2565":null,"2566":39190924.01,"2567":36200091.46,"2568":33614858.6,"2569":null},"xl":{"2566":4.19,"2567":6.93,"2568":5.25,"2569":null}},{"id":31,"name":"ภาควิชาวิศวฯเครื่องมือและวัสดุ","group":1,"kwh":{"2565":68782.42,"2566":84946.06,"2567":120280.47,"2568":169629.09,"2569":174462.56},"inc":{"2565":null,"2566":38304161.59,"2567":45575026.57,"2568":41232068.67,"2569":null},"xl":{"2566":2.22,"2567":2.64,"2568":4.11,"2569":null}},{"id":32,"name":"ภาควิชาวิศวฯเคมี","group":1,"kwh":{"2565":108211.22,"2566":98768.76,"2567":null,"2568":100638.1,"2569":104055.6},"inc":{"2565":null,"2566":43936886.94,"2567":57315737.68,"2568":35167585.61,"2569":null},"xl":{"2566":2.25,"2567":0.0,"2568":2.86,"2569":null}},{"id":33,"name":"ภาควิชาวิศวฯอาหาร","group":1,"kwh":{"2565":79412.63,"2566":97205.26,"2567":null,"2568":118409.92,"2569":123458.59},"inc":{"2565":null,"2566":13744482.24,"2567":21274282.04,"2568":11427729.41,"2569":null},"xl":{"2566":7.07,"2567":0.0,"2568":10.36,"2569":null}},{"id":34,"name":"ภาควิชาวิศวกรรมชีวภาพ","group":1,"kwh":{"2565":32770.24,"2566":25364.27,"2567":null,"2568":20911.8,"2569":21508.92},"inc":{"2565":null,"2566":36643664.91,"2567":36411335.18,"2568":44266939.08,"2569":null},"xl":{"2566":0.69,"2567":0.0,"2568":0.47,"2569":null}},{"id":35,"name":"สำนักคอมพิวเตอร์ (LX)","group":18,"kwh":{"2565":419784.94,"2566":191845.76,"2567":163965.58,"2568":192374.01,"2569":165650.59},"inc":{"2565":null,"2566":51802042.0,"2567":23324452.04,"2568":30981712.53,"2569":10682452.86},"xl":{"2566":3.7,"2567":7.03,"2568":6.21,"2569":15.51}},{"id":36,"name":"สำนักงานห้องเรียนวิศว์-วิทย์ (วมว.)","group":16,"kwh":{"2565":634008.8,"2566":869929.2,"2567":996368.1,"2568":1050605.6,"2569":1032223.9},"inc":{"2565":null,"2566":0.0,"2567":0.0,"2568":0.0,"2569":0.0},"xl":{"2566":null,"2567":null,"2568":null,"2569":null}},{"id":37,"name":"สถาบันพัฒนาและฝึกอบรมโรงงานต้นแบบ (สรบ.)","group":12,"kwh":{"2565":407981.0,"2566":328005.4,"2567":308679.8,"2568":359482.3,"2569":437310.0},"inc":{"2565":null,"2566":188839764.52,"2567":236751282.45,"2568":207173208.36,"2569":200773519.71},"xl":{"2566":1.74,"2567":1.3,"2568":1.74,"2569":2.18}},{"id":38,"name":"ศูนย์การศึกษาต่อเนื่อง (สวท.)","group":13,"kwh":{"2565":98967.31,"2566":72421.7,"2567":80353.89,"2568":35666.13,"2569":39652.02},"inc":{"2565":null,"2566":14858035.64,"2567":31437262.65,"2568":29370009.69,"2569":null},"xl":{"2566":4.87,"2567":2.56,"2568":1.21,"2569":null}},{"id":39,"name":"สวท. (office สำนักงาน)","group":13,"kwh":{"2565":67579.17,"2566":82976.57,"2567":237674.15,"2568":13065.84,"2569":14479.49},"inc":{"2565":null,"2566":63739853.01,"2567":68387154.82,"2568":53734616.73,"2569":280134231.5},"xl":{"2566":1.3,"2567":3.48,"2568":0.24,"2569":0.05}},{"id":40,"name":"ศูนย์บูรณาการเทคโนโลยีเพื่ออุตสาหกรรมไทย (สวท)","group":13,"kwh":{"2565":48685.33,"2566":54675.09,"2567":64449.83,"2568":6549.28,"2569":7257.88},"inc":{"2565":null,"2566":1645630.64,"2567":2526034.0,"2568":2689385.24,"2569":null},"xl":{"2566":33.22,"2567":25.51,"2568":2.44,"2569":null}},{"id":41,"name":"ศูนย์พัฒนาผลิตภาพฯ (สวท.)","group":13,"kwh":{"2565":4167.12,"2566":0.0,"2567":0.0,"2568":null,"2569":0.0},"inc":{"2565":null,"2566":-65138.0,"2567":181310.0,"2568":3111772.5,"2569":null},"xl":{"2566":0.0,"2567":0.0,"2568":0.0,"2569":null}},{"id":42,"name":"ศูนย์เทคโนโลยีซ่อมบำรุง (สวท.)","group":13,"kwh":{"2565":13282.94,"2566":0.0,"2567":0.0,"2568":null,"2569":0.0},"inc":{"2565":null,"2566":6236683.57,"2567":6989074.58,"2568":9173342.9,"2569":null},"xl":{"2566":0.0,"2567":0.0,"2568":0.0,"2569":null}},{"id":43,"name":"NBF","group":24,"kwh":{"2565":52790.1,"2566":111502.6,"2567":4089.9,"2568":3069.3,"2569":null},"inc":{"2565":null,"2566":63311965.66,"2567":32929969.67,"2568":193925.14,"2569":47354556.31},"xl":{"2566":1.76,"2567":0.12,"2568":15.83,"2569":0.0}},{"id":44,"name":"อาคารพระจอมเกล้าฯ","group":20,"kwh":{"2565":209068.85,"2566":477676.02,"2567":494035.5,"2568":510983.7,"2569":440486.8},"inc":{"2565":null,"2566":0.0,"2567":0.0,"2568":0.0,"2569":0.0},"xl":{"2566":null,"2567":null,"2568":null,"2569":null}},{"id":45,"name":"สำนักบริหารอาคารและสถานที่","group":19,"kwh":{"2565":34529.1,"2566":146951.22,"2567":13229.1,"2568":166459.01,"2569":154923.3},"inc":{"2565":null,"2566":80230651.5,"2567":57994641.12,"2568":66399815.72,"2569":null},"xl":{"2566":1.83,"2567":0.23,"2568":2.51,"2569":null}},{"id":46,"name":"EESH","group":null,"kwh":{"2565":0.0,"2566":null,"2567":null,"2568":null,"2569":null},"inc":{"2565":null,"2566":721486.87,"2567":647442.26,"2568":684188.05,"2569":null},"xl":{"2566":0.0,"2567":0.0,"2568":0.0,"2569":null}},{"id":47,"name":"หอพัก","group":28,"kwh":{"2565":738000.0,"2566":1012000.0,"2567":null,"2568":null,"2569":294801.3},"inc":{"2565":null,"2566":0.0,"2567":0.0,"2568":0.0,"2569":0.0},"xl":{"2566":null,"2567":null,"2568":null,"2569":null}},{"id":48,"name":"GMI","group":9,"kwh":{"2565":18264.14,"2566":69996.73,"2567":null,"2568":null,"2569":null},"inc":{"2565":null,"2566":39167999.16,"2567":30617261.06,"2568":36774077.85,"2569":53139740.47},"xl":{"2566":1.79,"2567":0.0,"2568":0.0,"2569":0.0}},{"id":49,"name":"KX","group":23,"kwh":{"2565":1326000.0,"2566":1611000.0,"2567":null,"2568":null,"2569":null},"inc":{"2565":null,"2566":0.0,"2567":0.0,"2568":0.0,"2569":0.0},"xl":{"2566":null,"2567":null,"2568":null,"2569":null}},{"id":50,"name":"มจธ.ราชบุรี","group":21,"kwh":{"2565":687222.52,"2566":884774.82,"2567":null,"2568":null,"2569":null},"inc":{"2565":null,"2566":46075774.67,"2567":57809489.16,"2568":56607772.43,"2569":null},"xl":{"2566":19.2,"2567":0.0,"2568":0.0,"2569":null}}];
+const ORIGINAL_SRC = "ไฟล์ต้นฉบับ: ชีต “ปริมาณไฟฟ้า” (50 หน่วยงาน)";
+const EF = 0.4999; // kgCO2e/kWh
+const PERIODS = {"2565":"ม.ค.–ธ.ค. 2565","2566":"ม.ค.–ธ.ค. 2566","2567":"ม.ค.–ก.ย. 2567","2568":"ม.ค.–ก.ย. 2568","2569":"ต.ค. 2568–ก.ย. 2569"};
+const PARTIAL = {"2567":true,"2568":true};
+
+let DATA = ORIGINAL, SRC = ORIGINAL_SRC;
+let YEARS = [], KWH_YEARS = [];
+const S = {year:null, q:"", kind:"all", scale:"log", sort:"ratio", dir:1, sel:null};
+const $ = id => document.getElementById(id);
+const fmt = (v,d=0) => v==null||!isFinite(v) ? "–" : v.toLocaleString("th-TH",{minimumFractionDigits:d,maximumFractionDigits:d});
+const fmtR = v => v==null ? "–" : fmt(v, v<10?2:(v<100?1:0));
+const esc = s => String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+function kindOf(u){
+  if (/^ภาควิชา/.test(u.name)) return "dept";
+  const any = Object.values(u.inc).some(v => v!=null && v!==0);
+  return any ? "unit" : "nosep";
+}
+const KIND_LABEL = {unit:"คณะ / สำนัก / ศูนย์", dept:"ภาควิชา (คณะวิศวฯ)", nosep:"ไม่มีรายรับแยก"};
+
+function calc(u,y){
+  const A = u.kwh[y], B = u.inc[y];
+  if (A==null) return {st:"noA",A,B};
+  if (B==null || B===0) return {st:"noB",A,B};
+  const r = A/B*1000;
+  if (B<0) return {st:"neg",A,B,raw:r};
+  return {st:"ok",A,B,r};
+}
+function prevYear(y){ const i = YEARS.indexOf(y); return i>0 ? YEARS[i-1] : null; }
+function delta(u,y){
+  const p = prevYear(y); if(!p) return null;
+  const a = calc(u,p), b = calc(u,y);
+  if (a.st!=="ok"||b.st!=="ok"||a.r===0) return null;
+  return (b.r-a.r)/a.r*100;
+}
+const STATUS = {
+  noA:["p-idle","ไม่มีข้อมูลไฟฟ้า"], noB:["p-idle","ไม่มีรายรับแยก"], neg:["p-warn","รายรับสุทธิติดลบ"]
+};
+
+const RENAME = {
+  "คณะวิศวฯ":"FEN คณะวิศวกรรมศาสตร์",
+  "คณะครุศาสตร์":"FIET คณะครุศาสตร์อุตสาหกรรมและเทคโนโลยี",
+  "คณะวิทยาศาสตร์ (รวม Learning Space)":"FSci คณะวิทยาศาสตร์ (รวม Learning Space)",
+  "Learning Space คณะวิทยาศาสตร์":"FSci Learning Space คณะวิทยาศาสตร์",
+  "คณะพลังงานและวัสดุ":"SEEM คณะพลังงานสิ่งแวดล้อมและวัสดุ",
+  "คณะทรัพยากรชีวภาพฯ":"SBT คณะทรัพยากรชีวภาพและเทคโนโลยี",
+  "คณะเทคโนโลยีสารสนเทศ (รวม LX)":"SIT คณะเทคโนโลยีสารสนเทศ (รวม LX)",
+  "คณะเทคโนโลยีสารสนเทศ (LX)":"SIT คณะเทคโนโลยีสารสนเทศ (LX)",
+  "คณะศิลปศาสตร์":"SoLA คณะศิลปศาสตร์",
+  "สำนักหอสมุด":"Lib สำนักหอสมุด",
+  "สำนักหอสมุด (LX)":"Lib สำนักหอสมุด (LX)",
+  "เทคโนโลยีมิเดียและศิลป์ประยุกต์":"MTA โครงการร่วมบริหารหลักสูตรมีเดียอาตส์และเทคโนโลยีมีเดีย",
+  "คณะสถาปัตยกรรมศาสตร์":"SoA+D คณะสถาปัตยกรรมศาสตร์และการออกแบบ",
+  "FIBO":"FIBO สถาบันวิทยาการหุ่นยนต์ภาคสนาม",
+  "สำนักบริหารอาคารและสถานที่":"BGM สำนักบริหารอาคารและสถานที่",
+  "สำนักอุทยานวิทยาศาสตร์และอุตสาหกรรม (สออ.)":"SAI สำนักอุทยานวิทยาศาสตร์และอุตสาหกรรม",
+  "สำนักคอมพิวเตอร์ (LX)":"CC สำนักคอมพิวเตอร์ (LX)",
+  "สถาบันพัฒนาและฝึกอบรมโรงงานต้นแบบ (สรบ.)":"PDTI สถาบันพัฒนาและฝึกอบรมโรงงานต้นแบบ",
+  "NBF":"NBF โรงงานต้นแบบผลิตยาชีววัตถุแห่งชาติ",
+  "GMI":"GMI บัณฑิตวิทยาลัยการจัดการและนวัตกรรม",
+  "ศูนย์การศึกษาต่อเนื่อง (สวท.)":"ISTRS ศูนย์การศึกษาต่อเนื่อง",
+  "สวท. (office สำนักงาน)":"ISTRS สำนักวิจัยและบริการวิทยาศาสตร์และเทคโนโลยี (สำนักงาน)",
+  "ศูนย์บูรณาการเทคโนโลยีเพื่ออุตสาหกรรมไทย (สวท)":"ISTRS ศูนย์บูรณาการเทคโนโลยีเพื่ออุตสาหกรรมไทย",
+  "ศูนย์พัฒนาผลิตภาพฯ (สวท.)":"ISTRS ศูนย์พัฒนาผลิตภาพ",
+  "ศูนย์เทคโนโลยีซ่อมบำรุง (สวท.)":"ISTRS ศูนย์เทคโนโลยีซ่อมบำรุง"
+};
+function nameHTML(n){ const m = n.match(/^([A-Z][A-Za-z+]{1,4})\s+(.*)$/); return m ? `<span class="code">${esc(m[1])}</span> ${esc(m[2])}` : esc(n); }
+function prepare(){
+  DATA.forEach(u => { const k = u.name.trim(); if (RENAME[k]) u.name = RENAME[k]; });
+  DATA.forEach(u => u.kind = kindOf(u));
+  const ys = new Set(); const ks = new Set();
+  DATA.forEach(u => { for (const y in u.inc) if (u.inc[y]!=null && u.inc[y]!==0) ys.add(y); for (const y in u.kwh) if (u.kwh[y]!=null) ks.add(y); });
+  YEARS = [...ys].filter(y => ks.has(y)).sort();
+  KWH_YEARS = [...ks].sort();
+  if (!YEARS.includes(S.year)) S.year = YEARS[YEARS.length-1];
+  if (S.sel!=null && !DATA.find(u=>u.id===S.sel)) S.sel = null;
+}
+
+function renderYears(){
+  $("years").innerHTML = YEARS.map(y => `<button data-y="${y}" aria-pressed="${y===S.year}"><small>ปี</small><b>${y}</b></button>`).join("");
+  $("period").innerHTML = `ช่วงข้อมูลไฟฟ้า: <b>${PERIODS[S.year]||S.year}</b>` + (PARTIAL[S.year] ? ` <span class="pill p-warn" title="ข้อมูลไฟฟ้ามีเพียง 9 เดือน อัตราส่วนจึงต่ำกว่าค่าทั้งปี">9 เดือน</span>`:"");
+}
+
+function median(a){ if(!a.length) return null; const s=[...a].sort((x,y)=>x-y), m=s.length>>1; return s.length%2?s[m]:(s[m-1]+s[m])/2; }
+
+function renderKPIs(){
+  const y = S.year, p = prevYear(y);
+  const sumK = yy => DATA.reduce((s,u)=>s+(u.kwh[yy]||0),0);
+  const tot = sumK(y), ptot = p ? sumK(p) : null;
+  const dTot = ptot ? (tot-ptot)/ptot*100 : null;
+  const units = DATA.filter(u=>u.kind!=="nosep");
+  const ok = units.map(u=>calc(u,y)).filter(c=>c.st==="ok");
+  const med = median(DATA.filter(u=>u.kind==="unit").map(u=>calc(u,y)).filter(c=>c.st==="ok").map(c=>c.r));
+  const ds = DATA.map(u=>delta(u,y)).filter(v=>v!=null);
+  const better = ds.filter(v=>v<0).length;
+  const dCls = dTot==null?"":(dTot<=0?"d-good":"d-bad");
+  $("kpis").innerHTML = `
+    <div class="kpi"><span class="lbl">การใช้ไฟฟ้ารวมทุกมิเตอร์</span><span class="val">${fmt(tot/1e6,2)}<small>ล้าน kWh</small></span>
+      <span class="note">${dTot==null?"":`<span class="delta ${dCls}">${dTot>0?"▲":"▼"} ${fmt(Math.abs(dTot),1)}%</span> เทียบปี ${p}`}</span></div>
+    <div class="kpi"><span class="lbl">ก๊าซเรือนกระจกจากไฟฟ้า</span><span class="val">${fmt(tot*EF/1000)}<small>tCO2e</small></span>
+      <span class="note">คิดที่ 0.4999 kgCO2e/kWh</span></div>
+    <div class="kpi"><span class="lbl">ค่ากลางอัตราส่วน (คณะ/สำนัก/ศูนย์)</span><span class="val">${fmtR(med)}<small>kWh / 1,000 บาท</small></span>
+      <span class="note">มัธยฐาน ไม่ถูกดึงด้วยค่าสุดโต่ง</span></div>
+    <div class="kpi"><span class="lbl">หน่วยงานที่คำนวณได้</span><span class="val">${ok.length}<small>จาก ${units.length}</small></span>
+      <span class="note">${ds.length?`${better} หน่วยงานค่าลดลงจากปีก่อน`:"ไม่มีปีก่อนให้เทียบ"}</span></div>`;
+}
+
+const COLS = [
+  {k:"rank",t:"#",cls:"rank"},
+  {k:"name",t:"หน่วยงาน",sort:true},
+  {k:"A",t:"ไฟฟ้า A (kWh)",sort:true,num:true},
+  {k:"B",t:"รายรับสุทธิ B (ล้านบาท)",sort:true,num:true},
+  {k:"ratio",t:"อัตราส่วน (A÷B)×1,000",sort:true,cls:"hl"},
+  {k:"delta",t:"เทียบปีก่อน",sort:true,num:true},
+];
+function rowsView(){
+  const y = S.year, q = S.q.trim().toLowerCase();
+  let rows = DATA.map(u => ({u, c:calc(u,y), d:delta(u,y)}))
+    .filter(r => (S.kind==="all" || r.u.kind===S.kind) && (!q || r.u.name.toLowerCase().includes(q)));
+  const ok = rows.filter(r=>r.c.st==="ok"), neg = rows.filter(r=>r.c.st==="neg"), rest = rows.filter(r=>r.c.st==="noA"||r.c.st==="noB");
+  const key = r => S.sort==="name"? r.u.name : S.sort==="A"? (r.c.A??-Infinity) : S.sort==="B"? (r.c.B??-Infinity) : S.sort==="delta"? (r.d??Infinity*S.dir) : r.c.r;
+  const cmp = (a,b) => { const x=key(a), y2=key(b); return (typeof x==="string"? x.localeCompare(y2,"th") : x-y2)*S.dir; };
+  if (S.sort==="ratio") { ok.sort(cmp); return {ok,rest,all:[...ok,...neg]}; }
+  const all = [...ok,...neg].sort(cmp); return {ok,rest,all};
+}
+function barW(r, ext){
+  if (r<=0) return 0;
+  if (S.scale==="lin") return r/ext.max*100;
+  const lo = Math.log10(ext.min/2), hi = Math.log10(ext.max);
+  return Math.max(2,(Math.log10(r)-lo)/(hi-lo)*100);
+}
+function renderTable(){
+  const y = S.year, v = rowsView();
+  const pos = DATA.map(u=>calc(u,y)).filter(c=>c.st==="ok"&&c.r>0).map(c=>c.r);
+  const ext = {min:Math.min(...pos), max:Math.max(...pos)};
+  $("thead").innerHTML = COLS.map(c => `<th class="${c.cls||""} ${c.num?"num":""} ${c.sort?"sortable":""}" ${c.sort?`data-k="${c.k}" aria-sort="${S.sort===c.k?(S.dir>0?"ascending":"descending"):"none"}"`:""}>${c.t}${S.sort===c.k?` <span class="arr">${S.dir>0?"↑":"↓"}</span>`:""}</th>`).join("");
+  let rank = 0;
+  $("tbody").innerHTML = v.all.map(({u,c,d}) => {
+    const okRow = c.st==="ok"; if (okRow) rank++;
+    let ratio;
+    if (okRow) ratio = `<div class="rbar"><div class="track"><div class="fill" style="width:${barW(c.r,ext).toFixed(1)}%"></div></div><span class="rv">${fmtR(c.r)}</span></div>`;
+    else { const [cls,t]=STATUS[c.st]; ratio = `<span class="pill ${cls}" ${c.st==="neg"?`data-tip="ค่าตามสูตรใน Excel = ${fmtR(c.raw)} แต่รายรับสุทธิติดลบทำให้ตีความไม่ได้"`:""}>${t}</span>`; }
+    let dd = "–";
+    if (d!=null){ const big = Math.abs(d)>100; dd = `<span class="delta ${d<0?"d-good":d>0?"d-bad":"d-flat"}">${d>0?"▲":d<0?"▼":""} ${fmt(Math.abs(d),1)}%</span>${big?` <span class="pill p-warn" data-tip="เปลี่ยนแปลงเกิน 100% ควรตรวจสอบข้อมูลรายรับหรือมิเตอร์">ตรวจสอบ</span>`:""}`; }
+    return `<tr data-id="${u.id}" class="${S.sel===u.id?"sel":""} ${okRow?"":"dim"}" tabindex="0">
+      <td class="rank">${okRow&&S.sort==="ratio"?rank:""}</td>
+      <td class="uname"><span class="nm">${nameHTML(u.name)}</span><span class="k">${KIND_LABEL[u.kind]}</span></td>
+      <td class="num">${fmt(c.A)}</td>
+      <td class="num">${c.B==null?"–":fmt(c.B/1e6,2)}</td>
+      <td class="ratio-cell">${ratio}</td>
+      <td class="num">${dd}</td></tr>`;
+  }).join("") || `<tr><td colspan="6" style="padding:24px;text-align:center;color:var(--muted)">ไม่พบหน่วยงานที่ตรงกับ “${esc(S.q)}”</td></tr>`;
+  $("count").textContent = `แสดง ${v.all.length} หน่วยงาน · ซ่อน ${v.rest.length} หน่วยงานที่ไม่มีข้อมูลรายรับหรือไฟฟ้าในปี ${y} · ${S.scale==="log"?"ความยาวแท่งใช้สเกล log เพราะค่าห่างกันหลายเท่า":"ความยาวแท่งใช้สเกลเชิงเส้น"}`;
+  $("tblTitle").textContent = `อันดับหน่วยงาน ปี ${y}`;
+}
+
+function lineChart(u){
+  const pts = YEARS.map(y => ({y, c:calc(u,y)}));
+  const vals = pts.filter(p=>p.c.st==="ok").map(p=>p.c.r);
+  if (!vals.length) return `<div class="msg p-idle">ยังไม่มีปีใดที่คำนวณอัตราส่วนได้</div>`;
+  const W=340,H=150,L=40,R=14,T=14,Bm=24;
+  const max = niceMax(Math.max(...vals)*1.1);
+  const x = i => L + (YEARS.length===1? (W-L-R)/2 : i*(W-L-R)/(YEARS.length-1));
+  const yv = v => T + (1 - v/max)*(H-T-Bm);
+  let g = "";
+  for (let i=0;i<=3;i++){ const v=max*i/3; g += `<line class="gl" x1="${L}" x2="${W-R}" y1="${yv(v)}" y2="${yv(v)}"/><text class="ax" x="${L-6}" y="${yv(v)+3}" text-anchor="end">${fmtR(v)}</text>`; }
+  YEARS.forEach((y,i)=> g += `<text class="ax" x="${x(i)}" y="${H-6}" text-anchor="middle" style="${y===S.year?"font-weight:700;fill:var(--ink)":""}">${y}</text>`);
+  let path = "", open = false;
+  pts.forEach((p,i)=>{ if(p.c.st==="ok"){ path += `${open?"L":"M"}${x(i)},${yv(p.c.r)} `; open=true; } else open=false; });
+  let dots = "";
+  pts.forEach((p,i)=>{ if(p.c.st!=="ok") return; const sel=p.y===S.year;
+    dots += `<circle cx="${x(i)}" cy="${yv(p.c.r)}" r="${sel?6:4.5}" fill="${sel?"var(--accent)":"var(--bar)"}" stroke="var(--surface)" stroke-width="2"/>
+      <circle cx="${x(i)}" cy="${yv(p.c.r)}" r="14" fill="transparent" data-tip="ปี ${p.y}: ${fmtR(p.c.r)} kWh ต่อ 1,000 บาท${PARTIAL[p.y]?" (ไฟฟ้า 9 เดือน)":""}"/>`;
+    if (sel) dots += `<text x="${x(i)}" y="${yv(p.c.r)-11}" text-anchor="middle" style="font-size:11px;font-weight:700;fill:var(--ink)">${fmtR(p.c.r)}</text>`; });
+  return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="แนวโน้มอัตราส่วนรายปี">${g}<path d="${path}" fill="none" stroke="var(--bar)" stroke-width="2"/>${dots}</svg>`;
+}
+function kwhChart(u){
+  const ys = KWH_YEARS, vals = ys.map(y=>u.kwh[y]);
+  const real = vals.filter(v=>v!=null); if(!real.length) return "";
+  const W=340,H=120,L=40,R=14,T=10,Bm=22;
+  const max = niceMax(Math.max(...real)*1.05) || 1;
+  const bw = (W-L-R)/ys.length, yv = v => T+(1-v/max)*(H-T-Bm);
+  let g = "";
+  for (let i=0;i<=2;i++){ const v=max*i/2; g += `<line class="gl" x1="${L}" x2="${W-R}" y1="${yv(v)}" y2="${yv(v)}"/><text class="ax" x="${L-6}" y="${yv(v)+3}" text-anchor="end">${v>=1e6?fmt(v/1e6,1)+"M":fmt(v/1e3,0)+"k"}</text>`; }
+  ys.forEach((y,i)=>{ const v=vals[i], cx=L+i*bw+bw/2, w=Math.min(34,bw-10), sel=y===S.year;
+    if (v!=null && v>0){ const top=yv(v), h=yv(0)-top, r=Math.min(4,h);
+      g += `<path d="M${cx-w/2},${yv(0)} V${top+r} Q${cx-w/2},${top} ${cx-w/2+r},${top} H${cx+w/2-r} Q${cx+w/2},${top} ${cx+w/2},${top+r} V${yv(0)} Z" fill="${sel?"var(--accent)":"var(--bar-soft)"}"/>`; }
+    g += `<rect x="${cx-bw/2}" y="${T}" width="${bw}" height="${H-T-Bm}" fill="transparent" data-tip="${PERIODS[y]||y}: ${v==null?"ไม่มีข้อมูล":fmt(v)+" kWh"}"/>`;
+    g += `<text class="ax" x="${cx}" y="${H-6}" text-anchor="middle" style="${sel?"font-weight:700;fill:var(--ink)":""}">${y}</text>`; });
+  return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="ปริมาณการใช้ไฟฟ้ารายปี">${g}</svg>`;
+}
+function niceMax(v){ if(!v||v<=0) return 1; const p=Math.pow(10,Math.floor(Math.log10(v))); const n=v/p; return (n<=1?1:n<=2?2:n<=2.5?2.5:n<=5?5:10)*p; }
+
+function renderDetail(){
+  const y = S.year;
+  let u = DATA.find(x=>x.id===S.sel);
+  if (!u) return;
+  const c = calc(u,y), d = delta(u,y), p = prevYear(y);
+  let head;
+  if (c.st==="ok") head = `<div class="big">${fmtR(c.r)}<small>kWh / 1,000 บาท</small></div>`;
+  else { const [cls,t]=STATUS[c.st]; head = `<div class="msg ${cls}"><b>${t}</b> · ${c.st==="noB"?"หน่วยงานนี้ไม่มีรายรับแยกในปีนี้ (เช่น เป็นมิเตอร์ย่อยหรือรวมอยู่ในหน่วยงานหลัก) จึงคำนวณอัตราส่วนไม่ได้":c.st==="neg"?`รายรับสุทธิติดลบ ค่าตามสูตรได้ ${fmtR(c.raw)} ซึ่งไม่สะท้อนประสิทธิภาพ ควรตรวจสอบตัวเลขรายรับและรายจ่ายภายใน`:"ยังไม่มีข้อมูลหน่วยการใช้ไฟฟ้าของปีนี้"}</div>`; }
+  $("detail").innerHTML = `<button class="x" data-close aria-label="ปิด">✕</button>
+    <div style="display:grid;gap:6px;padding-right:40px">
+      <div class="eyebrow">${KIND_LABEL[u.kind]} · ปี ${y}</div>
+      <h2>${nameHTML(u.name)}</h2>
+    </div>
+    ${head}
+    ${d!=null?`<div class="period"><span class="delta ${d<0?"d-good":"d-bad"}">${d<0?"▼ ลดลง":"▲ เพิ่มขึ้น"} ${fmt(Math.abs(d),1)}%</span> จากปี ${p} (${fmtR(calc(u,p).r)})</div>`:""}
+    <dl class="dl">
+      <dt>A · หน่วยการใช้ไฟฟ้า</dt><dd>${fmt(c.A)} kWh</dd>
+      <dt>B · รายรับสุทธิ</dt><dd>${c.B==null?"–":fmt(c.B)+" บาท"}</dd>
+      <dt>ก๊าซเรือนกระจกจากไฟฟ้า</dt><dd>${c.A==null?"–":fmt(c.A*EF/1000,1)+" tCO2e"}</dd>
+      <dt>ช่วงข้อมูลไฟฟ้า</dt><dd>${PERIODS[y]||y}</dd>
+    </dl>
+    ${c.st==="ok"?`<div class="formula">(<b>${fmt(c.A)}</b> ÷ <b>${fmt(c.B)}</b>) × 1,000 = <b>${fmt(c.r,4)}</b></div>`:""}
+    <div class="chart"><div class="cap"><span>อัตราส่วนรายปี</span><span>ต่ำ = ดี</span></div>${lineChart(u)}</div>
+    <div class="chart"><div class="cap"><span>หน่วยการใช้ไฟฟ้ารายปี (kWh)</span></div>${kwhChart(u)}</div>`;
+}
+
+function renderSegs(){
+  const opts = [["all","ทั้งหมด"],["unit","คณะ/สำนัก"]];
+  $("kindSeg").innerHTML = opts.map(([v,t])=>`<button data-v="${v}" aria-pressed="${S.kind===v}">${t}</button>`).join("");
+  [...$("scaleSeg").children].forEach(b=>b.setAttribute("aria-pressed", b.dataset.v===S.scale));
+}
+function render(){ renderYears(); renderKPIs(); renderSegs(); renderTable(); renderDetail(); $("srcLine").textContent = SRC + " · ไฟฟ้าปี 2567–2568 เป็นข้อมูล ม.ค.–ก.ย. ตามไฟล์ต้นฉบับ"; }
+
+/* events */
+$("years").addEventListener("click", e=>{ const b=e.target.closest("button"); if(b){ S.year=b.dataset.y; render(); }});
+$("kindSeg").addEventListener("click", e=>{ const b=e.target.closest("button"); if(b){ S.kind=b.dataset.v; render(); }});
+$("scaleSeg").addEventListener("click", e=>{ const b=e.target.closest("button"); if(b){ S.scale=b.dataset.v; renderSegs(); renderTable(); }});
+$("q").addEventListener("input", e=>{ S.q=e.target.value; renderTable(); });
+$("thead").addEventListener("click", e=>{ const th=e.target.closest("th[data-k]"); if(!th) return; const k=th.dataset.k;
+  if (S.sort===k) S.dir*=-1; else { S.sort=k; S.dir = (k==="A"||k==="B")?-1:1; } renderTable(); });
+let lastRow = null;
+function pick(tr){ if(!tr) return; lastRow = +tr.dataset.id; S.sel=lastRow; renderTable(); renderDetail();
+  $("modal").hidden=false; document.body.classList.add("locked"); $("detail").scrollTop=0; $("detail").querySelector(".x")?.focus(); }
+function closeModal(){ if($("modal").hidden) return; $("modal").hidden=true; document.body.classList.remove("locked"); tip.hidden=true;
+  document.querySelector(`tr[data-id="${lastRow}"]`)?.focus(); }
+$("modal").addEventListener("click", e=>{ if(e.target.closest("[data-close]")) closeModal(); });
+document.addEventListener("keydown", e=>{ if(e.key==="Escape") closeModal(); });
+$("tbody").addEventListener("click", e=>pick(e.target.closest("tr[data-id]")));
+$("tbody").addEventListener("keydown", e=>{ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); pick(e.target.closest("tr[data-id]")); }});
+
+$("copyBtn").addEventListener("click", async ()=>{
+  const y=S.year, v=rowsView();
+  const lines=[["หน่วยงาน","ประเภท",`ไฟฟ้า A (kWh) ${y}`,`รายรับสุทธิ B (บาท) ${y}`,"อัตราส่วน (A/B)*1000","สถานะ","เปลี่ยนแปลงจากปีก่อน (%)"].join("\t")];
+  v.all.forEach(({u,c,d})=>lines.push([u.name,KIND_LABEL[u.kind],c.A??"",c.B??"",c.st==="ok"?c.r.toFixed(4):"",c.st==="ok"?"คำนวณได้":STATUS[c.st][1],d==null?"":d.toFixed(1)].join("\t")));
+  const text=lines.join("\n"), btn=$("copyBtn");
+  try { await navigator.clipboard.writeText(text); btn.textContent="คัดลอกแล้ว"; }
+  catch { const ta=document.createElement("textarea"); ta.value=text; document.body.appendChild(ta); ta.select(); try{document.execCommand("copy"); btn.textContent="คัดลอกแล้ว";}catch{btn.textContent="คัดลอกไม่สำเร็จ";} ta.remove(); }
+  setTimeout(()=>btn.textContent="คัดลอกตาราง (วางใน Excel ได้)",1800);
+});
+
+/* tooltip */
+const tip=$("tip");
+document.addEventListener("mouseover", e=>{ const t=e.target.closest("[data-tip]"); if(!t){tip.hidden=true;return;} tip.textContent=t.dataset.tip; tip.hidden=false; });
+document.addEventListener("mousemove", e=>{ if(tip.hidden) return; const x=Math.min(e.clientX+12, innerWidth-tip.offsetWidth-8); tip.style.left=x+"px"; tip.style.top=(e.clientY+14)+"px"; });
+
+/* calculator */
+const num = s => { const v=parseFloat(String(s).replace(/[, ]/g,"")); return isFinite(v)?v:null; };
+function calcRun(){
+  const A=num($("cA").value), inc=num($("cInc").value), ex=num($("cExp").value)||0;
+  const B = inc==null?null:inc-ex;
+  let r = (A!=null && B) ? A/B*1000 : null;
+  $("calcOut").innerHTML = `<div><span>B · รายรับสุทธิ</span><b>${B==null?"–":fmt(B/1e6,2)}</b> <span>ล้านบาท</span></div>
+    <div><span>อัตราส่วน</span><b style="color:var(--accent)">${r==null?"–":B<0?"ติดลบ":fmt(r,2)}</b> <span>kWh / 1,000 บาท</span></div>
+    <div><span>ก๊าซเรือนกระจก</span><b>${A==null?"–":fmt(A*EF/1000,1)}</b> <span>tCO2e</span></div>`;
+}
+["cA","cInc","cExp"].forEach(id=>$(id).addEventListener("input",calcRun));
+
+/* Excel import */
+function lastYear(h){ const m = String(h??"").match(/25\d\d/g); return m ? m[m.length-1] : null; }
+function parseSheet(rows){
+  const hr = rows.findIndex(r => r && r.filter(c=>String(c??"").trim()==="หน่วยงาน").length>=2);
+  if (hr<0) throw new Error("ไม่พบแถวหัวตารางที่มีคำว่า “หน่วยงาน” อย่างน้อย 2 ช่อง");
+  const H = rows[hr];
+  const nameCols = H.map((c,i)=>String(c??"").trim()==="หน่วยงาน"?i:-1).filter(i=>i>=0);
+  // block with month-range headers = electricity, block with plain year headers after it = income
+  let eCol=null, iCol=null;
+  for (const nc of nameCols){
+    let j=nc+1, hasMonth=false, hasYear=false;
+    while (j<H.length && H[j]!=null && String(H[j]).trim()!=="" && String(H[j]).trim()!=="ลำดับ"){ const s=String(H[j]); if(/ม\.ค\.|ต\.ค\.|ธ\.ค\./.test(s)) hasMonth=true; if(/^\s*25\d\d\s*$/.test(s)) hasYear=true; j++; }
+    if (hasMonth && eCol==null) eCol=nc; else if (hasYear && eCol!=null && nc>eCol && iCol==null) iCol=nc;
+  }
+  if (eCol==null || iCol==null) throw new Error("ไม่พบบล็อก “ปริมาณการใช้ไฟฟ้า” และ “รายรับ” ตามรูปแบบไฟล์ต้นฉบับ");
+  const blockCols = (start,test) => { const m={}; let j=start+1; while(j<H.length && H[j]!=null && String(H[j]).trim()!=="" && String(H[j]).trim()!=="ลำดับ"){ const y=lastYear(H[j]); if(y && test(String(H[j]))) m[y]=j; j++; } return m; };
+  const eMap = blockCols(eCol, s=>!/diff/i.test(s)); // last matching column wins (e.g. ม.ค.–ธ.ค. over ม.ค.–ก.ย.)
+  const iMap = blockCols(iCol, ()=>true);
+  const n = v => (typeof v==="number" && isFinite(v)) ? Math.round(v*100)/100 : null;
+  const out=[];
+  for (let r=hr+1;r<rows.length;r++){
+    const row=rows[r]||[]; const name=String(row[eCol]??"").trim();
+    if (!name || /^SUM$/i.test(name) || /^หมายเหตุ/.test(name)) { if(name) break; else continue; }
+    const id = typeof row[eCol-1]==="number" ? row[eCol-1] : out.length+1;
+    const kwh={}, inc={};
+    for (const y in eMap) kwh[y]=n(row[eMap[y]]);
+    for (const y in iMap) inc[y]=n(row[iMap[y]]);
+    out.push({id,name,kwh,inc});
+  }
+  if (!out.length) throw new Error("ไม่พบแถวข้อมูลหน่วยงาน");
+  return {out, years:Object.keys(iMap)};
+}
+async function handleFile(f){
+  const msg=$("importMsg");
+  if (!window.XLSX){ msg.innerHTML=`<div class="msg p-bad">โหลดตัวอ่าน Excel ไม่สำเร็จ ลองรีเฟรชหน้าแล้วอัปโหลดอีกครั้ง</div>`; return; }
+  try{
+    const wb = XLSX.read(await f.arrayBuffer(), {type:"array"});
+    const name = wb.SheetNames.find(n=>n.includes("ไฟฟ้า")) || wb.SheetNames[0];
+    const rows = XLSX.utils.sheet_to_json(wb.Sheets[name], {header:1, raw:true, defval:null});
+    const {out, years} = parseSheet(rows);
+    DATA = out; SRC = `นำเข้าจาก ${f.name}: ชีต “${name}” (${out.length} หน่วยงาน)`; S.sel=null; S.year=null; prepare(); render();
+    msg.innerHTML=`<div class="msg p-good">นำเข้า ${out.length} หน่วยงานจากชีต “${esc(name)}” แล้ว · ปีที่มีรายรับ: ${years.join(", ")}</div>`;
+    $("resetBtn").hidden=false;
+  }catch(err){ msg.innerHTML=`<div class="msg p-bad">อ่านไฟล์ไม่ได้: ${esc(err.message)} ข้อมูลเดิมยังแสดงอยู่</div>`; }
+}
+$("file").addEventListener("change", e=>{ const f=e.target.files[0]; if(f) handleFile(f); e.target.value=""; });
+const drop=$("drop");
+["dragenter","dragover"].forEach(t=>drop.addEventListener(t,e=>{e.preventDefault();drop.classList.add("over");}));
+["dragleave","drop"].forEach(t=>drop.addEventListener(t,e=>{e.preventDefault();drop.classList.remove("over");}));
+drop.addEventListener("drop", e=>{ const f=e.dataTransfer.files[0]; if(f) handleFile(f); });
+$("resetBtn").addEventListener("click", ()=>{ DATA=ORIGINAL; SRC=ORIGINAL_SRC; S.sel=null; prepare(); render(); $("importMsg").innerHTML=`<div class="msg p-idle">กลับมาใช้ข้อมูลจากไฟล์ต้นฉบับแล้ว</div>`; $("resetBtn").hidden=true; });
+
+prepare(); render(); calcRun();
+
+</script>
